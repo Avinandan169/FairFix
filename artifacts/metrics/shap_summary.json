@@ -1,0 +1,65 @@
+{
+  "status": "success",
+  "top_shap_features": [
+    {
+      "feature": "ram_gb",
+      "impact_inr": 15642.06
+    },
+    {
+      "feature": "gpu_vram_gb",
+      "impact_inr": 14013.88
+    },
+    {
+      "feature": "total_pixels",
+      "impact_inr": 12303.47
+    },
+    {
+      "feature": "cpu_core_count",
+      "impact_inr": 7563.11
+    },
+    {
+      "feature": "storage_gb",
+      "impact_inr": 5050.09
+    },
+    {
+      "feature": "cpu_thread_count",
+      "impact_inr": 3015.12
+    },
+    {
+      "feature": "ppi",
+      "impact_inr": 2869.37
+    },
+    {
+      "feature": "cpu_series_Core Ultra 7",
+      "impact_inr": 2072.6
+    },
+    {
+      "feature": "display_aspect_ratio",
+      "impact_inr": 1908.45
+    },
+    {
+      "feature": "brand_dell",
+      "impact_inr": 1469.78
+    },
+    {
+      "feature": "display_size_inch",
+      "impact_inr": 1257.28
+    },
+    {
+      "feature": "threads_per_core",
+      "impact_inr": 1155.39
+    },
+    {
+      "feature": "gpu_series_GeForce RTX",
+      "impact_inr": 1015.18
+    },
+    {
+      "feature": "is_dedicated_gpu",
+      "impact_inr": 962.68
+    },
+    {
+      "feature": "brand_acer",
+      "impact_inr": 904.29
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "timestamp": "2026-11-13T22:30:00",
+  "total_models_evaluated": 6,
+  "comparison_table": [
+    {
+      "model_name": "Linear Regression",
+      "test_r2": 0.9448,
+      "test_mae_inr": 13337.88,
+      "test_rmse_inr": 20070.95,
+      "test_mape_pct": 17.51,
+      "cv_r2_mean": 0.8961,
+      "cv_r2_std": 0.0122,
+      "cv_mae_mean": 12832.52,
+      "group_cv_r2_mean": 0.8359,
+      "group_cv_mae_mean": 14567.52,
+      "is_best": false
+    },
+    {
+      "model_name": "Gradient Boosting",
+      "test_r2": 0.9307,
+      "test_mae_inr": 11230.32,
+      "test_rmse_inr": 22502.81,
+      "test_mape_pct": 10.05,
+      "cv_r2_mean": 0.9256,
+      "cv_r2_std": 0.0157,
+      "cv_mae_mean": 9919.17,
+      "group_cv_r2_mean": 0.8738,
+      "group_cv_mae_mean": 12013.22,
+      "is_best": true
+    },
+    {
+      "model_name": "XGBoost",
+      "test_r2": 0.9267,
+      "test_mae_inr": 11425.0,
+      "test_rmse_inr": 23135.14,
+      "test_mape_pct": 10.41,
+      "cv_r2_mean": 0.9254,
+      "cv_r2_std": 0.0131,
+      "cv_mae_mean": 10031.93,
+      "group_cv_r2_mean": 0.8665,
+      "group_cv_mae_mean": 12354.14,
+      "is_best": false
+    },
+    {
+      "model_name": "Decision Tree",
+      "test_r2": 0.9062,
+      "test_mae_inr": 14445.27,
+      "test_rmse_inr": 26172.7,
+      "test_mape_pct": 13.75,
+      "cv_r2_mean": 0.8036,
+      "cv_r2_std": 0.0754,
+      "cv_mae_mean": 14716.06,
+      "group_cv_r2_mean": 0.7806,
+      "group_cv_mae_mean": 16185.0,
+      "is_best": false
+    },
+    {
+      "model_name": "CatBoost",
+      "test_r2": 0.8804,
+      "test_mae_inr": 12647.85,
+      "test_rmse_inr": 29547.93,
+      "test_mape_pct": 11.4,
+      "cv_r2_mean": 0.9212,
+      "cv_r2_std": 0.0179,
+      "cv_mae_mean": 10339.46,
+      "group_cv_r2_mean": 0.8648,
+      "group_cv_mae_mean": 12832.77,
+      "is_best": false
+    },
+    {
+      "model_name": "Random Forest",
+      "test_r2": 0.8392,
+      "test_mae_inr": 14966.84,
+      "test_rmse_inr": 34270.0,
+      "test_mape_pct": 13.41,
+      "cv_r2_mean": 0.881,
+      "cv_r2_std": 0.0234,
+      "cv_mae_mean": 11925.97,
+      "group_cv_r2_mean": 0.8309,
+      "group_cv_mae_mean": 14330.46,
+      "is_best": false
+    }
+  ],
+  "best_model_name": "Gradient Boosting",
+  "key_takeaways": [
+    "Ensemble gradient boosting and bagging architectures capture nonlinear interactions between CPU tier, dedicated GPU presence, and RAM capacity significantly better than a single decision tree.",
+    "Grouped Cross-Validation (GroupKFold) strictly verifies generalization to unobserved laptop chassis and models without configuration leakage.",
+    "Models achieve experimental target performance (R\u00b2 > 0.90) on unseen test evaluation."
+  ]
+}

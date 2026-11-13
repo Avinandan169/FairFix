@@ -1,0 +1,149 @@
+{
+  "timestamp": "2026-11-13T22:30:00",
+  "selected_model": "Gradient Boosting",
+  "dataset_name": "Indian Laptop Specifications Dataset",
+  "dataset_samples": 992,
+  "train_samples": 793,
+  "test_samples": 199,
+  "target_variable": "price (INR \u20b9)",
+  "r2_target_met": true,
+  "metrics": {
+    "r2_score": 0.9307,
+    "mae_inr": 11230.32,
+    "rmse_inr": 22502.81,
+    "median_ae_inr": 4701.59,
+    "mape_percentage": 10.05,
+    "max_error_inr": 169300.39,
+    "sample_count": 199
+  },
+  "cross_validation": {
+    "n_splits": 5,
+    "type": "Standard K-Fold",
+    "r2_mean": 0.9256,
+    "r2_std": 0.0157,
+    "mae_mean": 9919.17,
+    "mae_std": 912.09,
+    "rmse_mean": 17065.93,
+    "rmse_std": 1333.99,
+    "fold_r2": [
+      0.9459,
+      0.9227,
+      0.9064,
+      0.9413,
+      0.9115
+    ]
+  },
+  "group_cross_validation": {
+    "n_splits": 5,
+    "type": "GroupKFold (Model Series Grouping)",
+    "r2_mean": 0.8738,
+    "r2_std": 0.0727,
+    "mae_mean": 12013.22,
+    "mae_std": 4035.74,
+    "rmse_mean": 20195.66,
+    "rmse_std": 6791.85,
+    "fold_r2": [
+      0.8419,
+      0.9468,
+      0.746,
+      0.9149,
+      0.9194
+    ]
+  },
+  "price_tier_performance": [
+    {
+      "tier_name": "Budget (< \u20b950,000)",
+      "count": 56,
+      "percentage_of_test_set": 28.1,
+      "mae_inr": 3304.07,
+      "r2_score": 0.5982,
+      "mape_percentage": 9.2
+    },
+    {
+      "tier_name": "Mid-Range (\u20b950,000 - \u20b91,00,000)",
+      "count": 85,
+      "percentage_of_test_set": 42.7,
+      "mae_inr": 6557.6,
+      "r2_score": 0.4338,
+      "mape_percentage": 9.19
+    },
+    {
+      "tier_name": "Upper Mid-Range (\u20b91,00,000 - \u20b91,50,000)",
+      "count": 26,
+      "percentage_of_test_set": 13.1,
+      "mae_inr": 15735.76,
+      "r2_score": -0.5483,
+      "mape_percentage": 12.38
+    },
+    {
+      "tier_name": "Enthusiast / Premium (> \u20b91,50,000)",
+      "count": 32,
+      "percentage_of_test_set": 16.1,
+      "mae_inr": 33852.49,
+      "r2_score": 0.782,
+      "mape_percentage": 11.91
+    }
+  ],
+  "top_features": [
+    {
+      "feature": "ram_gb",
+      "importance": 0.3121,
+      "percentage": 31.21,
+      "method": "Tree Impurity (MDI)"
+    },
+    {
+      "feature": "gpu_vram_gb",
+      "importance": 0.2097,
+      "percentage": 20.97,
+      "method": "Tree Impurity (MDI)"
+    },
+    {
+      "feature": "total_pixels",
+      "importance": 0.1968,
+      "percentage": 19.68,
+      "method": "Tree Impurity (MDI)"
+    },
+    {
+      "feature": "cpu_core_count",
+      "importance": 0.0705,
+      "percentage": 7.05,
+      "method": "Tree Impurity (MDI)"
+    },
+    {
+      "feature": "ppi",
+      "importance": 0.0313,
+      "percentage": 3.13,
+      "method": "Tree Impurity (MDI)"
+    },
+    {
+      "feature": "storage_gb",
+      "importance": 0.027,
+      "percentage": 2.7,
+      "method": "Tree Impurity (MDI)"
+    },
+    {
+      "feature": "cpu_thread_count",
+      "importance": 0.0221,
+      "percentage": 2.21,
+      "method": "Tree Impurity (MDI)"
+    },
+    {
+      "feature": "brand_dell",
+      "importance": 0.0155,
+      "percentage": 1.55,
+      "method": "Tree Impurity (MDI)"
+    },
+    {
+      "feature": "display_size_inch",
+      "importance": 0.0088,
+      "percentage": 0.88,
+      "method": "Tree Impurity (MDI)"
+    },
+    {
+      "feature": "threads_per_core",
+      "importance": 0.0084,
+      "percentage": 0.84,
+      "method": "Tree Impurity (MDI)"
+    }
+  ]
+}

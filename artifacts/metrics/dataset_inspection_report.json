@@ -1,0 +1,790 @@
+{
+  "timestamp": "2026-11-13T22:20:00",
+  "inspected_datasets": [
+    {
+      "name": "Indian Laptop Specifications Dataset (Cleaned)",
+      "source_url": "https://github.com/abhinavflac/laptops-specs-dataset",
+      "exists": true,
+      "file_path": "datasets/raw/indian_laptop_specs/laptops_cleaned.csv",
+      "rows": 992,
+      "columns_count": 27,
+      "duplicate_rows": 0,
+      "missing_cells_count": 2289,
+      "missing_percentage": 8.55,
+      "currency": "INR (\u20b9)",
+      "market": "India (Flipkart / Amazon / Smartprix e-commerce)",
+      "price_type": "New retail listed price",
+      "license": "MIT License (Permissive Open Source)",
+      "suitability": "Primary candidate for Indian market price prediction",
+      "target_variable": "price",
+      "target_summary": {
+        "column_name": "price",
+        "count": 992,
+        "mean": 87741.27,
+        "std": 68578.31,
+        "min": 12490.0,
+        "q25": 45912.5,
+        "median": 67990.0,
+        "q75": 99240.0,
+        "max": 605990.0
+      },
+      "column_details": [
+        {
+          "column": "brand",
+          "dtype": "str",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 19
+        },
+        {
+          "column": "model",
+          "dtype": "str",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 992
+        },
+        {
+          "column": "device_category",
+          "dtype": "str",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 5
+        },
+        {
+          "column": "price",
+          "dtype": "int64",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 559
+        },
+        {
+          "column": "rating",
+          "dtype": "int64",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 61
+        },
+        {
+          "column": "cpu_brand",
+          "dtype": "str",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 4
+        },
+        {
+          "column": "cpu_family",
+          "dtype": "str",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 7
+        },
+        {
+          "column": "cpu_series",
+          "dtype": "str",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 24
+        },
+        {
+          "column": "cpu_model",
+          "dtype": "str",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 119
+        },
+        {
+          "column": "cpu_suffix",
+          "dtype": "str",
+          "null_count": 131,
+          "null_percentage": 13.21,
+          "unique_count": 11
+        },
+        {
+          "column": "cpu_core_count",
+          "dtype": "int64",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 11
+        },
+        {
+          "column": "cpu_thread_count",
+          "dtype": "int64",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 14
+        },
+        {
+          "column": "cpu_p_cores",
+          "dtype": "float64",
+          "null_count": 289,
+          "null_percentage": 29.13,
+          "unique_count": 7
+        },
+        {
+          "column": "cpu_e_cores",
+          "dtype": "float64",
+          "null_count": 311,
+          "null_percentage": 31.35,
+          "unique_count": 6
+        },
+        {
+          "column": "cpu_lp_e_cores",
+          "dtype": "float64",
+          "null_count": 826,
+          "null_percentage": 83.27,
+          "unique_count": 3
+        },
+        {
+          "column": "ram_gb",
+          "dtype": "int64",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 9
+        },
+        {
+          "column": "storage_gb",
+          "dtype": "int64",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 8
+        },
+        {
+          "column": "display_width_px",
+          "dtype": "int64",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 16
+        },
+        {
+          "column": "display_height_px",
+          "dtype": "int64",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 23
+        },
+        {
+          "column": "display_size_inch",
+          "dtype": "int64",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 8
+        },
+        {
+          "column": "gpu_brand",
+          "dtype": "str",
+          "null_count": 8,
+          "null_percentage": 0.81,
+          "unique_count": 5
+        },
+        {
+          "column": "gpu_series",
+          "dtype": "str",
+          "null_count": 8,
+          "null_percentage": 0.81,
+          "unique_count": 10
+        },
+        {
+          "column": "gpu_model",
+          "dtype": "str",
+          "null_count": 8,
+          "null_percentage": 0.81,
+          "unique_count": 38
+        },
+        {
+          "column": "gpu_vram_gb",
+          "dtype": "float64",
+          "null_count": 700,
+          "null_percentage": 70.56,
+          "unique_count": 7
+        },
+        {
+          "column": "gpu_type",
+          "dtype": "str",
+          "null_count": 8,
+          "null_percentage": 0.81,
+          "unique_count": 2
+        },
+        {
+          "column": "os_name",
+          "dtype": "str",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 6
+        },
+        {
+          "column": "warranty_years",
+          "dtype": "int64",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 3
+        }
+      ]
+    },
+    {
+      "name": "Indian Laptop Specifications Dataset (Raw Scraped)",
+      "source_url": "https://github.com/abhinavflac/laptops-specs-dataset",
+      "exists": true,
+      "file_path": "datasets/raw/indian_laptop_specs/laptops_raw.csv",
+      "rows": 1011,
+      "columns_count": 11,
+      "duplicate_rows": 2,
+      "missing_cells_count": 56,
+      "missing_percentage": 0.5,
+      "currency": "INR (\u20b9)",
+      "market": "India",
+      "price_type": "New retail listed price",
+      "license": "MIT License",
+      "suitability": "Raw source verification and validation",
+      "target_variable": "price",
+      "target_summary": {
+        "column_name": "price",
+        "count": 1011,
+        "mean": 86893.93,
+        "std": 68338.5,
+        "min": 10999.0,
+        "q25": 44926.0,
+        "median": 67499.0,
+        "q75": 98453.0,
+        "max": 605990.0
+      },
+      "column_details": [
+        {
+          "column": "model",
+          "dtype": "str",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 1009
+        },
+        {
+          "column": "price",
+          "dtype": "str",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 567
+        },
+        {
+          "column": "rating",
+          "dtype": "float64",
+          "null_count": 1,
+          "null_percentage": 0.1,
+          "unique_count": 67
+        },
+        {
+          "column": "processor",
+          "dtype": "str",
+          "null_count": 8,
+          "null_percentage": 0.79,
+          "unique_count": 158
+        },
+        {
+          "column": "cores",
+          "dtype": "str",
+          "null_count": 23,
+          "null_percentage": 2.27,
+          "unique_count": 48
+        },
+        {
+          "column": "ram",
+          "dtype": "str",
+          "null_count": 3,
+          "null_percentage": 0.3,
+          "unique_count": 49
+        },
+        {
+          "column": "storage",
+          "dtype": "str",
+          "null_count": 4,
+          "null_percentage": 0.4,
+          "unique_count": 11
+        },
+        {
+          "column": "display",
+          "dtype": "str",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 77
+        },
+        {
+          "column": "graphics",
+          "dtype": "str",
+          "null_count": 10,
+          "null_percentage": 0.99,
+          "unique_count": 121
+        },
+        {
+          "column": "os",
+          "dtype": "str",
+          "null_count": 3,
+          "null_percentage": 0.3,
+          "unique_count": 11
+        },
+        {
+          "column": "warranty",
+          "dtype": "str",
+          "null_count": 4,
+          "null_percentage": 0.4,
+          "unique_count": 3
+        }
+      ]
+    },
+    {
+      "name": "Laptop Price Prediction Dataset (Uncleaned)",
+      "source_url": "https://www.kaggle.com/datasets/ehtishamsadiq/uncleaned-laptop-price-dataset",
+      "exists": true,
+      "file_path": "datasets/raw/ehtishamsadiq/laptopData.csv",
+      "rows": 1303,
+      "columns_count": 12,
+      "duplicate_rows": 29,
+      "missing_cells_count": 360,
+      "missing_percentage": 2.3,
+      "currency": "INR (Estimated converted from EUR ~2017 rate)",
+      "market": "Global / European resale/e-commerce mirror",
+      "price_type": "Retail asking price",
+      "license": "Database Contents License (DbCL) / Kaggle Open Data",
+      "suitability": "Suitable for external validation experiment; not merged directly due to temporal/exchange-rate skew",
+      "target_variable": "Price",
+      "target_summary": {
+        "column_name": "Price",
+        "count": 1273,
+        "mean": 59955.81,
+        "std": 37332.25,
+        "min": 9270.72,
+        "q25": 31914.72,
+        "median": 52161.12,
+        "q75": 79333.39,
+        "max": 324954.72
+      },
+      "column_details": [
+        {
+          "column": "Unnamed: 0",
+          "dtype": "float64",
+          "null_count": 30,
+          "null_percentage": 2.3,
+          "unique_count": 1273
+        },
+        {
+          "column": "Company",
+          "dtype": "str",
+          "null_count": 30,
+          "null_percentage": 2.3,
+          "unique_count": 19
+        },
+        {
+          "column": "TypeName",
+          "dtype": "str",
+          "null_count": 30,
+          "null_percentage": 2.3,
+          "unique_count": 6
+        },
+        {
+          "column": "Inches",
+          "dtype": "str",
+          "null_count": 30,
+          "null_percentage": 2.3,
+          "unique_count": 25
+        },
+        {
+          "column": "ScreenResolution",
+          "dtype": "str",
+          "null_count": 30,
+          "null_percentage": 2.3,
+          "unique_count": 40
+        },
+        {
+          "column": "Cpu",
+          "dtype": "str",
+          "null_count": 30,
+          "null_percentage": 2.3,
+          "unique_count": 118
+        },
+        {
+          "column": "Ram",
+          "dtype": "str",
+          "null_count": 30,
+          "null_percentage": 2.3,
+          "unique_count": 10
+        },
+        {
+          "column": "Memory",
+          "dtype": "str",
+          "null_count": 30,
+          "null_percentage": 2.3,
+          "unique_count": 40
+        },
+        {
+          "column": "Gpu",
+          "dtype": "str",
+          "null_count": 30,
+          "null_percentage": 2.3,
+          "unique_count": 110
+        },
+        {
+          "column": "OpSys",
+          "dtype": "str",
+          "null_count": 30,
+          "null_percentage": 2.3,
+          "unique_count": 9
+        },
+        {
+          "column": "Weight",
+          "dtype": "str",
+          "null_count": 30,
+          "null_percentage": 2.3,
+          "unique_count": 189
+        },
+        {
+          "column": "Price",
+          "dtype": "float64",
+          "null_count": 30,
+          "null_percentage": 2.3,
+          "unique_count": 777
+        }
+      ]
+    },
+    {
+      "name": "Laptop Price Benchmark Dataset",
+      "source_url": "https://www.kaggle.com/datasets/muhammetvarl/laptop-price",
+      "exists": true,
+      "file_path": "datasets/raw/muhammetvarl/laptop_price.csv",
+      "rows": 1303,
+      "columns_count": 13,
+      "duplicate_rows": 0,
+      "missing_cells_count": 0,
+      "missing_percentage": 0.0,
+      "currency": "EUR (\u20ac)",
+      "market": "European retail listings (2017-2018)",
+      "price_type": "New retail listed price in Euros",
+      "license": "CC0: Public Domain",
+      "suitability": "External benchmark dataset; incompatible for direct merge with Indian INR dataset without temporal purchasing parity",
+      "target_variable": "Price_euros",
+      "target_summary": {
+        "column_name": "Price_euros",
+        "count": 1303,
+        "mean": 1123.69,
+        "std": 699.01,
+        "min": 174.0,
+        "q25": 599.0,
+        "median": 977.0,
+        "q75": 1487.88,
+        "max": 6099.0
+      },
+      "column_details": [
+        {
+          "column": "laptop_ID",
+          "dtype": "int64",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 1303
+        },
+        {
+          "column": "Company",
+          "dtype": "str",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 19
+        },
+        {
+          "column": "Product",
+          "dtype": "str",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 618
+        },
+        {
+          "column": "TypeName",
+          "dtype": "str",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 6
+        },
+        {
+          "column": "Inches",
+          "dtype": "float64",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 18
+        },
+        {
+          "column": "ScreenResolution",
+          "dtype": "str",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 40
+        },
+        {
+          "column": "Cpu",
+          "dtype": "str",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 118
+        },
+        {
+          "column": "Ram",
+          "dtype": "str",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 9
+        },
+        {
+          "column": "Memory",
+          "dtype": "str",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 39
+        },
+        {
+          "column": "Gpu",
+          "dtype": "str",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 110
+        },
+        {
+          "column": "OpSys",
+          "dtype": "str",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 9
+        },
+        {
+          "column": "Weight",
+          "dtype": "str",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 179
+        },
+        {
+          "column": "Price_euros",
+          "dtype": "float64",
+          "null_count": 0,
+          "null_percentage": 0.0,
+          "unique_count": 791
+        }
+      ]
+    },
+    {
+      "name": "Laptop Details Dataset (Engineered Scraped)",
+      "source_url": "https://www.kaggle.com/datasets/nabihazahid/laptop-details-dataset",
+      "exists": true,
+      "file_path": "datasets/raw/nabihazahid/laptop_scrap_data.csv",
+      "rows": 1563,
+      "columns_count": 21,
+      "duplicate_rows": 2,
+      "missing_cells_count": 63,
+      "missing_percentage": 0.19,
+      "currency": "USD ($)",
+      "market": "Global / North American retail e-commerce",
+      "price_type": "Retail listed price in USD",
+      "license": "CC0: Public Domain",
+      "suitability": "Suitable for external feature validation and cross-market reference; incompatible for direct merge",
+      "target_variable": "Price",
+      "target_summary": {
+        "column_name": "Price",
+        "count": 1560,
+        "mean": 1947.01,
+        "std": 693.18,
+        "min": 305.99,
+        "q25": 1496.8,
+        "median": 1807.8,
+        "q75": 2227.8,
+        "max": 7488.8
+      },
+      "column_details": [
+        {
+          "column": "Company",
+          "dtype": "str",
+          "null_count": 3,
+          "null_percentage": 0.19,
+          "unique_count": 18
+        },
+        {
+          "column": "TypeName",
+          "dtype": "str",
+          "null_count": 3,
+          "null_percentage": 0.19,
+          "unique_count": 455
+        },
+        {
+          "column": "Inches",
+          "dtype": "float64",
+          "null_count": 3,
+          "null_percentage": 0.19,
+          "unique_count": 26
+        },
+        {
+          "column": "ScreenResolution",
+          "dtype": "str",
+          "null_count": 3,
+          "null_percentage": 0.19,
+          "unique_count": 29
+        },
+        {
+          "column": "Cpu",
+          "dtype": "str",
+          "null_count": 3,
+          "null_percentage": 0.19,
+          "unique_count": 230
+        },
+        {
+          "column": "Gpu",
+          "dtype": "str",
+          "null_count": 3,
+          "null_percentage": 0.19,
+          "unique_count": 134
+        },
+        {
+          "column": "OpSys",
+          "dtype": "str",
+          "null_count": 3,
+          "null_percentage": 0.19,
+          "unique_count": 3
+        },
+        {
+          "column": "TouchScreen",
+          "dtype": "float64",
+          "null_count": 3,
+          "null_percentage": 0.19,
+          "unique_count": 2
+        },
+        {
+          "column": "Ips",
+          "dtype": "float64",
+          "null_count": 3,
+          "null_percentage": 0.19,
+          "unique_count": 2
+        },
+        {
+          "column": "X_res",
+          "dtype": "float64",
+          "null_count": 3,
+          "null_percentage": 0.19,
+          "unique_count": 17
+        },
+        {
+          "column": "Y_res",
+          "dtype": "float64",
+          "null_count": 3,
+          "null_percentage": 0.19,
+          "unique_count": 24
+        },
+        {
+          "column": "ppi",
+          "dtype": "float64",
+          "null_count": 3,
+          "null_percentage": 0.19,
+          "unique_count": 60
+        },
+        {
+          "column": "Dedicated_Gpu",
+          "dtype": "float64",
+          "null_count": 3,
+          "null_percentage": 0.19,
+          "unique_count": 2
+        },
+        {
+          "column": "Ram_GB",
+          "dtype": "float64",
+          "null_count": 3,
+          "null_percentage": 0.19,
+          "unique_count": 15
+        },
+        {
+          "column": "Weight_kg",
+          "dtype": "float64",
+          "null_count": 3,
+          "null_percentage": 0.19,
+          "unique_count": 152
+        },
+        {
+          "column": "SSD",
+          "dtype": "float64",
+          "null_count": 3,
+          "null_percentage": 0.19,
+          "unique_count": 23
+        },
+        {
+          "column": "HHD",
+          "dtype": "float64",
+          "null_count": 3,
+          "null_percentage": 0.19,
+          "unique_count": 4
+        },
+        {
+          "column": "Storage_Type",
+          "dtype": "str",
+          "null_count": 3,
+          "null_percentage": 0.19,
+          "unique_count": 3
+        },
+        {
+          "column": "Total_Storage_GB",
+          "dtype": "float64",
+          "null_count": 3,
+          "null_percentage": 0.19,
+          "unique_count": 26
+        },
+        {
+          "column": "Storage_Category",
+          "dtype": "str",
+          "null_count": 3,
+          "null_percentage": 0.19,
+          "unique_count": 6
+        },
+        {
+          "column": "Price",
+          "dtype": "float64",
+          "null_count": 3,
+          "null_percentage": 0.19,
+          "unique_count": 355
+        }
+      ]
+    }
+  ],
+  "reference_datasets": [
+    {
+      "name": "Best Buy Laptop Pricing Dataset",
+      "source_url": "https://platform.stratascratch.com/data-projects/laptop-price-prediction",
+      "exists": false,
+      "access_type": "Proprietary Platform / Account Authentication Required",
+      "rows": "~1,200",
+      "currency": "USD ($)",
+      "market": "United States (Best Buy Retail)",
+      "price_type": "buynow_price (New Retail)",
+      "license": "StrataScratch Educational Terms",
+      "suitability": "Useful only for research/reference (inaccessible directly via open raw link)"
+    },
+    {
+      "name": "Remanufactured Laptops Research Dataset (Turkolmez et al. 2024)",
+      "source_url": "https://doi.org/10.1007/s10796-024-10515-9",
+      "exists": false,
+      "access_type": "Academic Proprietary / Author Custody",
+      "rows": "1,500 new listings + 874 remanufactured listings",
+      "currency": "EUR (\u20ac) / GBP (\u00a3)",
+      "market": "European Circular Economy / Third-party Remanufacturers",
+      "price_type": "New component price vs Remanufactured resale price",
+      "license": "Academic Research Publication",
+      "suitability": "Used as the authoritative methodology reference for used-laptop depreciation heuristics"
+    }
+  ],
+  "compatibility_matrix": {
+    "primary_training_dataset": "Indian Laptop Specifications Dataset (Cleaned) - 992 rows, 27 features, INR",
+    "external_validation_datasets": [
+      "Laptop Price Benchmark Dataset (Muhammet Varl - 1,303 rows, EUR)",
+      "Laptop Scrap Details Dataset (Nabihazahid - 1,563 rows, USD)"
+    ],
+    "incompatible_for_direct_merge": [
+      {
+        "dataset": "Muhammet Varl (EUR) & Nabihazahid (USD)",
+        "reason": "Direct currency conversion ignores local taxes (18% GST in India, 20% VAT in EU), import tariffs, historical exchange rate volatility (2017 vs 2024), and local market pricing strategies. Merging without market adjustment creates massive artificial variance."
+      },
+      {
+        "dataset": "Ehtisham Sadiq (LaptopData)",
+        "reason": "Derived mirror of Muhammet Varl dataset converted at a 2017 exchange rate with artificial null values introduced. Introducing it would cause duplicate observation leakage."
+      }
+    ],
+    "research_reference_only": [
+      "Turkolmez et al. (2024) Remanufactured Laptops Dataset",
+      "Best Buy StrataScratch Dataset"
+    ]
+  }
+}
