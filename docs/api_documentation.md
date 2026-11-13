@@ -16,6 +16,13 @@
 | `GET` | `/options` | Dropdown dictionaries for brands, CPUs, GPUs, and conditions | Options JSON |
 | `GET` | `/model-metrics` | Authentic empirical metrics, comparison table, SHAP values, and scatter points | Telemetry JSON |
 | `POST` | `/predict` | Evaluates hardware specifications and optional used condition to compute valuation | `ValuationResponse` |
+| `POST` | `/diagnosis/predict` | Supervised NLP fault classification from symptom text | `DiagnosisResponse` |
+| `GET` | `/diagnosis/metrics` | Diagnostic classifier cross-validation, accuracy, and confusion matrix | Telemetry JSON |
+| `GET` | `/repair/pricing/options` | Available repair components, brands, and repair types | Options JSON |
+| `GET` | `/repair/pricing` | Verifiable Indian market repair pricing benchmarks | List of Records |
+| `POST` | `/repair/estimate` | Computes parts, labour, and combined repair cost range | `RepairPricingEstimateResponse` |
+| `POST` | `/repair/evaluate-quote` | Evaluates technician quote against market benchmarks | `QuoteEvaluationResponse` |
+| `POST` | `/repair/decision` | Computes Repair-to-Value ratio and repair-vs-replace recommendation | `RepairDecisionResponse` |
 
 ---
 

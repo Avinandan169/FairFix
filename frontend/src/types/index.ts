@@ -159,3 +159,131 @@ export interface ModelMetricsResponse {
     inspected_count: number;
   };
 }
+
+// Repair Intelligence Types
+export interface AlternativeFault {
+  fault_type: string;
+  confidence_score: number;
+  confidence_percentage: number;
+}
+
+export interface DiagnosisResponse {
+  status: 'CONFIDENT_DIAGNOSIS' | 'LOW_CONFIDENCE' | 'INSUFFICIENT_INPUT';
+  is_confident: boolean;
+  primary_fault: string | null;
+  confidence_score: number;
+  confidence_percentage: number;
+  alternatives: AlternativeFault[];
+  influential_keywords: string[];
+  suggested_checks: string[];
+  input_symptom: string;
+  disclaimer: string;
+}
+
+export interface CostRange {
+  min: number;
+  max: number;
+}
+
+export interface RepairPricingRecord {
+  record_id: string;
+  laptop_brand: string;
+  laptop_model_or_compatible_category: string;
+  component: string;
+  repair_type: string;
+  part_description: string;
+  part_price_min: number;
+  part_price_max: number;
+  labour_min: number;
+  labour_max: number;
+  currency: string;
+  market_location: string;
+  source_name: string;
+  source_url: string;
+  source_type: string;
+  date_collected: string;
+  verification_status: string;
+  notes: string;
+}
+
+export interface RepairPricingEstimate {
+  found: boolean;
+  component?: string;
+  currency?: string;
+  part_cost_range?: CostRange;
+  labour_cost_range?: CostRange;
+  total_estimated_range?: CostRange;
+  representative_matches?: RepairPricingRecord[];
+  primary_source?: string;
+  market_location?: string;
+  message?: string;
+}
+
+export interface QuoteEvaluationResponse {
+  success: boolean;
+  quoted_price?: number;
+  verdict?: 'BELOW_REFERENCE' | 'FAIR_AND_COMPETITIVE' | 'SLIGHTLY_ABOVE_REFERENCE' | 'SIGNIFICANTLY_ABOVE_REFERENCE';
+  verdict_label?: string;
+  badge_color?: 'emerald' | 'amber' | 'orange' | 'rose';
+  benchmark_range?: { min: number; max: number; midpoint: number };
+  variance?: { difference_inr: number; percentage: number };
+  parts_benchmark?: CostRange;
+  labour_benchmark?: CostRange;
+  market_location?: string;
+  primary_source?: string;
+  explanation?: string;
+  suggested_questions?: string[];
+  message?: string;
+}
+
+export interface RepairDecisionResponse {
+  success: boolean;
+  verdict?: 'REPAIR_RECOMMENDED' | 'BORDERLINE_EVALUATE' | 'BORDERLINE_LEAN_REPLACE' | 'REPLACEMENT_RECOMMENDED';
+  verdict_label?: string;
+  badge_color?: 'emerald' | 'amber' | 'orange' | 'rose';
+  repair_cost_ratio?: number;
+  repair_cost_ratio_pct?: number;
+  economic_summary?: string;
+  decision_factors?: string[];
+  financial_breakdown?: {
+    repair_cost_inr: number;
+    device_market_value_inr: number;
+    repair_cost_ratio_pct: number;
+    net_equity_after_repair_inr: number;
+    device_age_years?: number;
+    device_condition?: string;
+  };
+  valuation_source?: string;
+  error?: string;
+}
+
+export interface DiagnosisMetricsResponse {
+  model_name: string;
+  pipeline_version: string;
+  dataset_name: string;
+  total_samples: number;
+  train_samples: number;
+  test_samples: number;
+  num_classes: number;
+  classes: string[];
+  model_comparison: Record<string, {
+    cv_macro_f1_mean: number;
+    cv_macro_f1_std: number;
+    cv_accuracy_mean: number;
+  }>;
+  test_metrics: {
+    accuracy: number;
+    macro_f1: number;
+    weighted_f1: number;
+    macro_precision: number;
+    macro_recall: number;
+  };
+  per_class_metrics: Record<string, {
+    precision: number;
+    recall: number;
+    f1_score: number;
+    support: number;
+  }>;
+  confusion_matrix: number[][];
+  top_keywords_per_class: Record<string, string[]>;
+}

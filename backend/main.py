@@ -10,13 +10,14 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from backend.routes.prediction import router as prediction_router
 from backend.routes.metrics import router as metrics_router
+from backend.routes.repair import router as repair_router, diagnosis_router
 from backend.services.prediction_service import get_prediction_service
 
 
 app = FastAPI(
     title="FAIRFIX API",
-    description="Machine Learning Price Intelligence & Valuation Engine for Laptops",
-    version="1.0.0"
+    description="Machine Learning Price & Repair Intelligence Engine for Laptops",
+    version="1.1.0"
 )
 
 # Enable CORS for frontend integration
@@ -31,6 +32,8 @@ app.add_middleware(
 # Register routes
 app.include_router(prediction_router)
 app.include_router(metrics_router)
+app.include_router(repair_router)
+app.include_router(diagnosis_router)
 
 
 @app.get("/health", summary="Health check endpoint")
@@ -54,13 +57,20 @@ async def health_check():
 async def root():
     return {
         "project": "FAIRFIX",
-        "description": "ML-Based Price Intelligence and Valuation for Used and Out-of-Warranty Laptops",
+        "description": "ML-Based Price Intelligence and Repair Intelligence for Laptops",
         "documentation": "/docs",
         "endpoints": {
             "health": "/health",
             "predict": "/predict",
             "options": "/options",
-            "metrics": "/model-metrics"
+            "metrics": "/model-metrics",
+            "diagnosis_predict": "/diagnosis/predict",
+            "diagnosis_metrics": "/diagnosis/metrics",
+            "repair_pricing_options": "/repair/pricing/options",
+            "repair_pricing": "/repair/pricing",
+            "repair_estimate": "/repair/estimate",
+            "repair_quote_evaluation": "/repair/evaluate-quote",
+            "repair_decision": "/repair/decision"
         }
     }
 

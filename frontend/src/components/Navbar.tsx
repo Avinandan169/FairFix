@@ -2,16 +2,16 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ShieldCheck, Cpu, BarChart3, BookOpen, Layers } from 'lucide-react';
+import { ShieldCheck, Cpu, BarChart3, Wrench, Layers } from 'lucide-react';
 
 export default function Navbar() {
   const pathname = usePathname();
 
   const navLinks = [
     { href: '/', label: 'Overview', icon: Layers },
-    { href: '/valuation', label: 'Valuation Studio', icon: Cpu },
-    { href: '/dashboard', label: 'Model Dashboard', icon: BarChart3 },
-    { href: '/methodology', label: 'Research & Methodology', icon: BookOpen },
+    { href: '/valuation', label: 'Laptop Valuation', icon: Cpu },
+    { href: '/repair', label: 'Repair Intelligence', icon: Wrench },
+    { href: '/dashboard', label: 'Model Performance', icon: BarChart3 },
   ];
 
   return (
@@ -28,7 +28,7 @@ export default function Navbar() {
                 ML Intelligence
               </span>
             </span>
-            <p className="text-[11px] text-slate-400 font-medium">Laptop Valuation & Deal Intelligence</p>
+            <p className="text-[11px] text-slate-400 font-medium">Independent Repair & Price Intelligence</p>
           </div>
         </Link>
 

@@ -12,7 +12,11 @@ import {
   CheckCircle2,
   AlertTriangle,
   Layers,
-  HelpCircle
+  HelpCircle,
+  Wrench,
+  Scale,
+  TrendingUp,
+  DollarSign
 } from 'lucide-react';
 
 export default function HomePage() {
@@ -57,22 +61,22 @@ export default function HomePage() {
     <div className="space-y-24 py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* Hero Section */}
       <section className="text-center space-y-6 pt-6 sm:pt-12">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-xs text-slate-300 shadow-inner">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-xs text-slate-300 shadow-inner">
           <span className="flex h-2 w-2 rounded-full bg-cyan-400"></span>
-          <span>B.Tech CSE Project • Research-Backed Machine Learning Intelligence</span>
+          <span>FairFix — Independent Repair & Price Intelligence for Electronics</span>
         </div>
 
         <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white max-w-4xl mx-auto leading-tight sm:leading-none">
-          Know the True Market Value of Any{' '}
+          Understand what your device is worth,{' '}
           <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-400 bg-clip-text text-transparent">
-            Laptop
+            what it costs to fix,
           </span>{' '}
-          Before You Buy.
+          and whether the deal is fair.
         </h1>
 
         <p className="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto font-normal leading-relaxed">
-          FairFix uses genuinely trained Machine Learning regression models ($R^2 = 0.9307$) combined with empirical
-          depreciation heuristics to protect consumers from overpriced used and out-of-warranty laptops in the Indian market.
+          FairFix combines trained Machine Learning regression models ($R^2 = 0.9307$) for laptop market valuation with supervised
+          NLP fault diagnosis and verified Indian repair cost benchmarks (Nehru Place, SP Road, Lamington Road) to empower consumer decisions.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
@@ -81,16 +85,24 @@ export default function HomePage() {
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 shadow-lg shadow-cyan-500/25 transition-all text-base"
           >
             <Cpu className="h-5 w-5" />
-            <span>Value a Laptop Now</span>
+            <span>Laptop Valuation Studio</span>
             <ArrowRight className="h-4 w-4" />
           </Link>
 
           <Link
-            href="/dashboard"
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-slate-200 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 transition-all text-base"
+            href="/repair"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-slate-200 bg-slate-900 hover:bg-slate-800 border border-slate-700 hover:border-slate-600 shadow-lg shadow-slate-950 transition-all text-base"
           >
-            <BarChart3 className="h-5 w-5 text-cyan-400" />
-            <span>Explore ML Metrics (R² 0.93)</span>
+            <Wrench className="h-5 w-5 text-cyan-400" />
+            <span>Repair Intelligence & Quotes</span>
+          </Link>
+
+          <Link
+            href="/dashboard"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-slate-400 hover:text-white bg-transparent hover:bg-slate-900/60 border border-transparent hover:border-slate-800 transition-all text-base"
+          >
+            <BarChart3 className="h-5 w-5" />
+            <span>ML Telemetry (R² 0.93)</span>
           </Link>
         </div>
 
@@ -98,23 +110,115 @@ export default function HomePage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto pt-8 border-t border-slate-900 text-left">
           <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80">
             <div className="text-2xl font-bold text-emerald-400 font-mono">0.9307</div>
-            <div className="text-xs text-slate-400 font-medium">Test Set R² Score</div>
+            <div className="text-xs text-slate-400 font-medium">Valuation Test R²</div>
             <div className="text-[11px] text-slate-500">Target R² &gt; 0.90 Met</div>
           </div>
           <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80">
             <div className="text-2xl font-bold text-cyan-400 font-mono">₹11,230</div>
             <div className="text-xs text-slate-400 font-medium">Mean Absolute Error</div>
-            <div className="text-[11px] text-slate-500">Unseen test set in INR</div>
+            <div className="text-[11px] text-slate-500">Out-of-sample in INR</div>
           </div>
           <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80">
-            <div className="text-2xl font-bold text-blue-400 font-mono">0.8738</div>
-            <div className="text-xs text-slate-400 font-medium">GroupKFold CV R²</div>
-            <div className="text-[11px] text-slate-500">Chassis-leakage proof</div>
+            <div className="text-2xl font-bold text-blue-400 font-mono">72.4%</div>
+            <div className="text-xs text-slate-400 font-medium">Diagnosis Accuracy</div>
+            <div className="text-[11px] text-slate-500">17 real fault classes (ORA)</div>
           </div>
           <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80">
-            <div className="text-2xl font-bold text-indigo-400 font-mono">6 Models</div>
-            <div className="text-xs text-slate-400 font-medium">Benchmarked Zoo</div>
-            <div className="text-[11px] text-slate-500">GBR Won on Test & CV</div>
+            <div className="text-2xl font-bold text-amber-400 font-mono">33 Benchmarks</div>
+            <div className="text-xs text-slate-400 font-medium">Verified Price Records</div>
+            <div className="text-[11px] text-slate-500">Nehru Place / SP Road / Cashify</div>
+          </div>
+        </div>
+      </section>
+
+      {/* Two Pillars Showcase */}
+      <section className="space-y-8">
+        <div className="text-center space-y-2">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+            Two Complementary Intelligence Engines
+          </h2>
+          <p className="text-sm text-slate-400 max-w-xl mx-auto">
+            FairFix connects market valuation with repair feasibility to give you end-to-end transparency.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Pillar 1 Card */}
+          <div className="p-8 rounded-2xl bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 space-y-5 hover:border-cyan-800/60 transition-all">
+            <div className="flex items-center gap-3">
+              <div className="h-12 w-12 rounded-xl bg-cyan-950 border border-cyan-800/80 flex items-center justify-center text-cyan-400">
+                <Cpu className="h-6 w-6" />
+              </div>
+              <div>
+                <span className="text-xs font-mono uppercase text-cyan-400 font-semibold">Engine 01</span>
+                <h3 className="text-xl font-bold text-white">Laptop Price Valuation & Deal Audit</h3>
+              </div>
+            </div>
+            <p className="text-sm text-slate-400 leading-relaxed">
+              Trained Gradient Boosting model analyzes interacting hardware specs (CPU cores/threads, RAM, NVMe storage, dedicated GPU, display resolution) and applies verified depreciation heuristics for age, battery health, and cosmetic wear.
+            </p>
+            <ul className="space-y-2 text-xs text-slate-300">
+              <li className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-cyan-400" />
+                <span>$R^2 = 0.9307$ and MAE = ₹11,230 on held-out test data</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-cyan-400" />
+                <span>SHAP feature contributions explain price premiums</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-cyan-400" />
+                <span>Objective verdict: Great Deal, Fair Price, or Overpriced</span>
+              </li>
+            </ul>
+            <div className="pt-2">
+              <Link
+                href="/valuation"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-cyan-400 hover:text-cyan-300 group"
+              >
+                <span>Launch Valuation Studio</span>
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+          </div>
+
+          {/* Pillar 2 Card */}
+          <div className="p-8 rounded-2xl bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 space-y-5 hover:border-amber-800/60 transition-all">
+            <div className="flex items-center gap-3">
+              <div className="h-12 w-12 rounded-xl bg-amber-950 border border-amber-800/80 flex items-center justify-center text-amber-400">
+                <Wrench className="h-6 w-6" />
+              </div>
+              <div>
+                <span className="text-xs font-mono uppercase text-amber-400 font-semibold">Engine 02</span>
+                <h3 className="text-xl font-bold text-white">Repair Intelligence & Quote Audit</h3>
+              </div>
+            </div>
+            <p className="text-sm text-slate-400 leading-relaxed">
+              Calibrated text classifier trained on 3,500+ Open Repair Alliance records isolates hardware faults from symptoms. Verified Indian market pricing catalogue audits technician quotes and calculates Repair-to-Value ratios.
+            </p>
+            <ul className="space-y-2 text-xs text-slate-300">
+              <li className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-amber-400" />
+                <span>17 fault categories with calibrated confidence percentages</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-amber-400" />
+                <span>Verified parts & labour ranges (Nehru Place, SP Road)</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-amber-400" />
+                <span>Repair-vs-Replace economic optimizer (30% / 50% ratio rules)</span>
+              </li>
+            </ul>
+            <div className="pt-2">
+              <Link
+                href="/repair"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-amber-400 hover:text-amber-300 group"
+              >
+                <span>Explore Repair Intelligence</span>
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -214,57 +318,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Why FairFix Is Different (Engineering Principles) */}
-      <section className="space-y-10">
-        <div className="text-center space-y-2">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-            Built on Rigorous ML Methodology, Not Gimmicks
-          </h2>
-          <p className="text-sm text-slate-400 max-w-xl mx-auto">
-            Designed for university evaluation and real-world consumer protection with 100% genuine metrics.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 space-y-3">
-            <div className="h-10 w-10 rounded-xl bg-cyan-950 border border-cyan-800/80 flex items-center justify-center text-cyan-400">
-              <Cpu className="h-5 w-5" />
-            </div>
-            <h3 className="text-lg font-bold text-white">Genuine Machine Learning</h3>
-            <p className="text-sm text-slate-400 leading-relaxed">
-              Trained on 992 modern laptop specifications in the Indian market. Evaluated against 6 candidate architectures with strictly held-out test data.
-            </p>
-          </div>
-
-          <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 space-y-3">
-            <div className="h-10 w-10 rounded-xl bg-blue-950 border border-blue-800/80 flex items-center justify-center text-blue-400">
-              <TrendingDown className="h-5 w-5" />
-            </div>
-            <h3 className="text-lg font-bold text-white">Literature-Backed Depreciation</h3>
-            <p className="text-sm text-slate-400 leading-relaxed">
-              Explicitly separates new baseline prediction from used-device wear. Implements the remanufacturing life-cycle depreciation framework from Türkolmez et al. (2024).
-            </p>
-          </div>
-
-          <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 space-y-3">
-            <div className="h-10 w-10 rounded-xl bg-indigo-950 border border-indigo-800/80 flex items-center justify-center text-indigo-400">
-              <ShieldCheck className="h-5 w-5" />
-            </div>
-            <h3 className="text-lg font-bold text-white">Chassis Anti-Leakage Defense</h3>
-            <p className="text-sm text-slate-400 leading-relaxed">
-              Evaluated using GroupKFold cross-validation by product chassis family to guarantee that sister laptop configurations never contaminate validation folds.
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* Call to Action */}
       <section className="rounded-3xl bg-gradient-to-r from-cyan-950/40 via-blue-950/30 to-indigo-950/40 border border-cyan-900/40 p-8 sm:p-12 text-center space-y-6">
         <h2 className="text-2xl sm:text-4xl font-bold text-white tracking-tight">
-          Ready to Test FairFix with Real Hardware?
+          Ready to Make Smart Electronics Decisions?
         </h2>
         <p className="text-slate-400 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
-          Input your laptop brand, processor generation, RAM, storage, and condition parameters to inspect fair price valuation, confidence ranges, and deal assessment.
+          Whether evaluating a laptop for purchase or determining whether to repair or replace a faulty machine, FairFix gives you verified, data-backed answers.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
@@ -274,10 +334,16 @@ export default function HomePage() {
             Launch Valuation Studio
           </Link>
           <Link
-            href="/methodology"
-            className="px-6 py-3 rounded-xl font-semibold text-slate-300 bg-slate-900 hover:bg-slate-800 border border-slate-800 transition-all text-sm"
+            href="/repair"
+            className="px-6 py-3 rounded-xl font-semibold text-slate-200 bg-slate-900 hover:bg-slate-800 border border-slate-800 transition-all text-sm"
           >
-            Read Research & Methodology
+            Launch Repair Intelligence
+          </Link>
+          <Link
+            href="/dashboard"
+            className="px-6 py-3 rounded-xl font-semibold text-slate-400 hover:text-white transition-all text-sm"
+          >
+            View Model Metrics
           </Link>
         </div>
       </section>

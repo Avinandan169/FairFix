@@ -2,52 +2,46 @@
 
 **Project Title:** ML-Based Price Intelligence and Valuation for Used and Out-of-Warranty Laptops  
 **Degree / Academic Focus:** University B.Tech Computer Science and Engineering  
-**Version:** 1.0.0 (Production Release)
+**Version:** 1.1.0 (Production Release with Repair Intelligence)
 
 ---
 
 ## 1. High-Level Architectural Overview
 
-FairFix is an end-to-end Machine Learning intelligence platform designed to address information asymmetry in consumer electronics markets. It combines genuine machine learning regression models trained on modern hardware specifications with an empirical second-hand depreciation layer, exposed through an asynchronous FastAPI backend and an interactive Next.js interface.
+FairFix is an end-to-end Machine Learning intelligence platform designed to address information asymmetry in consumer electronics markets. It combines two complementary capabilities:
+1. **Laptop Valuation Engine:** Genuinely trained Machine Learning regression models ($R^2 = 0.9307$) predicting new and depreciated used laptop prices.
+2. **Repair Intelligence & Decision Hub:** Supervised NLP fault diagnosis on 3,500+ Open Repair Alliance records, verified Indian parts and labour price benchmarks (Nehru Place, SP Road, Lamington Road), technician quote evaluation, and an economic Repair-versus-Replace decision optimizer.
 
 ```mermaid
 flowchart TD
     subgraph Data Layer
-        A1[Indian Laptop Specs Dataset<br/>992 samples, 27 features] --> B[Feature Engineering Engine]
-        A2[Foreign Benchmark Datasets<br/>EUR & USD Kaggle Datasets] -.->|Validation & PPP Reference| B
+        A1[Indian Laptop Specs Dataset<br/>992 samples, 27 features] --> B1[Valuation Preprocessor]
+        A2[Open Repair Alliance CompCat<br/>3,511 records, 17 classes] --> B2[Diagnosis NLP Preprocessor]
+        A3[Indian Repair Benchmarks<br/>Nehru Place, SP Road, Cashify] --> B3[Pricing Catalogue Engine]
     end
 
-    subgraph Feature & ML Layer
-        B --> C[ColumnTransformer Preprocessor<br/>StandardScaler + OneHotEncoder]
-        C --> D1[Linear Regression / Ridge]
-        C --> D2[Decision Tree Regressor]
-        C --> D3[Random Forest Regressor]
-        C --> D4[CatBoost Regressor]
-        C --> D5[XGBoost Regressor]
-        C --> D6[Gradient Boosting Regressor<br/><b>Selected Optimal: R² = 0.9307</b>]
-        D6 --> E[Serialized Artifacts<br/>Joblib Pipelines & JSON Metrics]
+    subgraph Machine Learning Layer
+        B1 --> C1[Gradient Boosting Regressor<br/><b>Selected Optimal: R² = 0.9307</b>]
+        B2 --> C2[Calibrated Linear SVC<br/><b>TF-IDF, Accuracy = 72.35%</b>]
     end
 
-    subgraph Valuation & Heuristics
-        E --> F1[Base ML Price Prediction<br/>New Retail Market Value]
-        F2[Used Condition Inputs<br/>Age, Battery, Cosmetic, Screen] --> F3[Literature-Backed Depreciation<br/>Turkolmez et al. 2024 Framework]
-        F1 --> G[Fair Market Valuation Engine]
-        F3 --> G
-        H[Seller Asking Price] --> I[Deal Assessment & Deviation Matrix]
-        G --> I
+    subgraph Service Layer
+        C1 --> S1[Valuation & Depreciation Service]
+        C2 --> S2[Fault Diagnosis & Triage Service]
+        B3 --> S3[Repair Pricing & Quote Audit Service]
+        S1 & S3 --> S4[Repair vs Replace Decision Service]
     end
 
-    subgraph Backend Layer
-        I --> J[FastAPI Asynchronous Gateway<br/>/predict, /model-metrics, /health, /options]
+    subgraph Backend API Gateway
+        S1 & S2 & S3 & S4 --> API[FastAPI Asynchronous Gateway<br/>Port 8000]
     end
 
     subgraph Frontend Client
-        J <==> K[Next.js 15 App Router<br/>React 19 + TypeScript + Tailwind CSS]
-        K --> L1[Landing Experience]
-        K --> L2[Interactive Valuation Studio]
-        K --> L3[Deal Assessment & SHAP Visualizer]
-        K --> L4[Model Performance Dashboard]
-        K --> L5[Methodology & Literature Portal]
+        API <==> FE[Next.js 15 App Router<br/>React 19 + TypeScript + Tailwind CSS]
+        FE --> UI1[Overview Landing Page]
+        FE --> UI2[Laptop Valuation Studio]
+        FE --> UI3[Repair Intelligence Hub]
+        FE --> UI4[Model Performance Dashboard]
     end
 ```
 

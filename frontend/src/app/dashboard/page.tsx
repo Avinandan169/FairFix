@@ -14,21 +14,26 @@ import {
   ExternalLink,
   ShieldCheck
 } from 'lucide-react';
-import { ModelMetricsResponse } from '../../types';
-import { getModelMetrics } from '../../services/api';
+import { ModelMetricsResponse, DiagnosisMetricsResponse } from '../../types';
+import { getModelMetrics, getDiagnosisMetrics } from '../../services/api';
 
 export default function DashboardPage() {
   const [data, setData] = useState<ModelMetricsResponse | null>(null);
+  const [diagnosisData, setDiagnosisData] = useState<DiagnosisMetricsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'comparison' | 'charts' | 'features' | 'tiers'>('comparison');
+  const [activeTab, setActiveTab] = useState<'comparison' | 'charts' | 'features' | 'tiers' | 'diagnosis'>('comparison');
 
   const fetchMetrics = async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await getModelMetrics();
-      setData(res);
+      const [resVal, resDiag] = await Promise.all([
+        getModelMetrics(),
+        getDiagnosisMetrics().catch(() => null)
+      ]);
+      setData(resVal);
+      setDiagnosisData(resDiag);
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'Failed to fetch metrics from backend');
@@ -199,6 +204,16 @@ export default function DashboardPage() {
           }`}
         >
           Price Tier Error Stratification
+        </button>
+        <button
+          onClick={() => setActiveTab('diagnosis')}
+          className={`py-3 px-4 text-xs font-semibold border-b-2 transition-all ${
+            activeTab === 'diagnosis'
+              ? 'border-cyan-400 text-cyan-400'
+              : 'border-transparent text-slate-400 hover:text-white'
+          }`}
+        >
+          Fault Classifier Telemetry (NLP)
         </button>
       </div>
 
@@ -410,6 +425,169 @@ export default function DashboardPage() {
               </table>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Tab 5: Fault Diagnosis NLP Classifier */}
+      {activeTab === 'diagnosis' && (
+        <div className="space-y-8">
+          {!diagnosisData ? (
+            <div className="p-8 text-center text-slate-400">
+              Loading diagnosis classifier telemetry...
+            </div>
+          ) : (
+            <>
+              {/* Top KPI row */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-950 border border-emerald-900/40 space-y-1">
+                  <span className="text-xs text-slate-400 font-medium">Test Set Accuracy</span>
+                  <div className="text-3xl sm:text-4xl font-extrabold text-emerald-400 font-mono">
+                    {(diagnosisData.test_metrics.accuracy * 100).toFixed(1)}%
+                  </div>
+                  <p className="text-[11px] text-slate-500">
+                    Across 17 real community fault classes (random baseline is 5.8%)
+                  </p>
+                </div>
+
+                <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-950 border border-cyan-900/40 space-y-1">
+                  <span className="text-xs text-slate-400 font-medium">Macro F1 Score</span>
+                  <div className="text-3xl sm:text-4xl font-extrabold text-cyan-400 font-mono">
+                    {diagnosisData.test_metrics.macro_f1.toFixed(4)}
+                  </div>
+                  <p className="text-[11px] text-slate-500">
+                    Unweighted average across all imbalanced classes
+                  </p>
+                </div>
+
+                <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-950 border border-blue-900/40 space-y-1">
+                  <span className="text-xs text-slate-400 font-medium">Weighted F1 Score</span>
+                  <div className="text-3xl sm:text-4xl font-extrabold text-blue-400 font-mono">
+                    {diagnosisData.test_metrics.weighted_f1.toFixed(4)}
+                  </div>
+                  <p className="text-[11px] text-slate-500">
+                    Support-weighted harmonic mean of precision & recall
+                  </p>
+                </div>
+
+                <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-950 border border-purple-900/40 space-y-1">
+                  <span className="text-xs text-slate-400 font-medium">Trained Samples</span>
+                  <div className="text-3xl sm:text-4xl font-extrabold text-purple-400 font-mono">
+                    {diagnosisData.total_samples.toLocaleString()}
+                  </div>
+                  <p className="text-[11px] text-slate-500">
+                    {diagnosisData.train_samples} train / {diagnosisData.test_samples} held-out test
+                  </p>
+                </div>
+              </div>
+
+              {/* Model Comparison Table */}
+              <div className="rounded-2xl bg-slate-900/60 border border-slate-800 overflow-hidden">
+                <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-bold text-white">
+                      NLP Classifier 5-Fold Stratified Cross-Validation Benchmark
+                    </h3>
+                    <p className="text-xs text-slate-400">
+                      Comparing text classification algorithms on TF-IDF word & bi-gram vectors (sublinear scaling).
+                    </p>
+                  </div>
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-cyan-950 border border-cyan-800 text-cyan-400 font-semibold">
+                    Winning: Calibrated Linear SVC
+                  </span>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs font-mono">
+                    <thead className="bg-slate-950 text-slate-400 border-b border-slate-800">
+                      <tr>
+                        <th className="p-3 font-semibold">Algorithm Candidate</th>
+                        <th className="p-3 font-semibold">CV Macro F1 (Mean)</th>
+                        <th className="p-3 font-semibold">CV Macro F1 (Std)</th>
+                        <th className="p-3 font-semibold">CV Accuracy (Mean)</th>
+                        <th className="p-3 font-semibold">Calibration Method</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/60 text-slate-300">
+                      {Object.entries(diagnosisData.model_comparison).map(([modelKey, metrics]) => {
+                        const isWinning = modelKey === 'Calibrated_Linear_SVC';
+                        return (
+                          <tr
+                            key={modelKey}
+                            className={isWinning ? 'bg-cyan-950/30 text-white font-bold' : 'hover:bg-slate-800/30'}
+                          >
+                            <td className="p-3 font-sans font-medium">
+                              {modelKey.replace(/_/g, ' ')}
+                              {isWinning && (
+                                <span className="ml-2 text-[10px] px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">
+                                  Selected Champion
+                                </span>
+                              )}
+                            </td>
+                            <td className="p-3 text-cyan-300 font-bold">{metrics.cv_macro_f1_mean.toFixed(4)}</td>
+                            <td className="p-3 text-slate-400">±{metrics.cv_macro_f1_std.toFixed(4)}</td>
+                            <td className="p-3 text-emerald-300 font-bold">{(metrics.cv_accuracy_mean * 100).toFixed(2)}%</td>
+                            <td className="p-3 font-sans text-slate-400">
+                              {modelKey === 'Calibrated_Linear_SVC' ? 'Sigmoid (Platt Scaling, 3-fold)' : 'Standard / None'}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Per-Class Metrics Table */}
+              <div className="rounded-2xl bg-slate-900/60 border border-slate-800 overflow-hidden">
+                <div className="p-4 border-b border-slate-800">
+                  <h3 className="text-sm font-bold text-white">
+                    Per-Category Classification Report on Held-Out Test Split (481 Samples)
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Detailed precision, recall, and F1 performance across all 17 empirical fault categories.
+                  </p>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs font-mono">
+                    <thead className="bg-slate-950 text-slate-400 border-b border-slate-800">
+                      <tr>
+                        <th className="p-3 font-semibold">Fault Category</th>
+                        <th className="p-3 font-semibold">Test Support</th>
+                        <th className="p-3 font-semibold">Precision</th>
+                        <th className="p-3 font-semibold">Recall</th>
+                        <th className="p-3 font-semibold">F1-Score</th>
+                        <th className="p-3 font-semibold font-sans">Top Predictive Keywords</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/60 text-slate-300">
+                      {Object.entries(diagnosisData.per_class_metrics).map(([cls, met]) => {
+                        const keywords = diagnosisData.top_keywords_per_class[cls] || [];
+                        return (
+                          <tr key={cls} className="hover:bg-slate-800/30">
+                            <td className="p-3 font-sans font-medium text-white">{cls}</td>
+                            <td className="p-3 text-slate-400">{met.support}</td>
+                            <td className="p-3 text-cyan-300 font-bold">{(met.precision * 100).toFixed(1)}%</td>
+                            <td className="p-3 text-blue-300 font-bold">{(met.recall * 100).toFixed(1)}%</td>
+                            <td className="p-3 text-emerald-400 font-bold">{(met.f1_score * 100).toFixed(1)}%</td>
+                            <td className="p-3 font-sans">
+                              <div className="flex flex-wrap gap-1">
+                                {keywords.slice(0, 4).map((kw, idx) => (
+                                  <span key={idx} className="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 font-mono">
+                                    {kw}
+                                  </span>
+                                ))}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>

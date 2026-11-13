@@ -1,33 +1,34 @@
 # FAIRFIX
 
-> **ML-Based Price Intelligence and Valuation for Used and Out-of-Warranty Laptops**  
-> *B.Tech Computer Science and Engineering Capstone Project*  
-> **Status:** Fully Trained, Evaluated, and Reproducible ML Platform with Full-Stack Web Application  
+> **Independent Repair & Price Intelligence for Electronics**  
+> *B.Tech Computer Science and Engineering Project*  
+> **Central Product Promise:** *"Understand what your device is worth, what it might cost to fix, and whether the deal is actually fair."*  
+> **Status:** Fully Trained ML Valuation Pipeline + Supervised Repair Fault Classifier + Verifiable Pricing Catalogue + Full-Stack Next.js 15 Interface  
 
 [![Python](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-1.0.0-009688.svg)](https://fastapi.tiangolo.com/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-1.1.0-009688.svg)](https://fastapi.tiangolo.com/)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black.svg)](https://nextjs.org/)
-[![Test R²](https://img.shields.io/badge/Test_R²-0.9307-success.svg)](#4-empirical-machine-learning-benchmark)
-[![Test MAE](https://img.shields.io/badge/Test_MAE-₹11,230-cyan.svg)](#4-empirical-machine-learning-benchmark)
+[![Valuation R²](https://img.shields.io/badge/Valuation_Test_R²-0.9307-success.svg)](#4-empirical-machine-learning-benchmark)
+[![Diagnosis Accuracy](https://img.shields.io/badge/Diagnosis_Accuracy-72.35%25-cyan.svg)](#5-repair-intelligence--fault-diagnosis-telemetry)
+[![Pricing Benchmarks](https://img.shields.io/badge/Verified_Benchmarks-33_Records-amber.svg)](#6-indian-repair-cost-intelligence)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
 
 ## 1. Project Overview & Problem Statement
 
-Consumers purchasing used or out-of-warranty laptops face severe information asymmetry. Unlike automobiles or commodities, laptop valuation involves complex, interacting factors:
-- **Processor architecture & generation** (Intel Core Ultra, 13th/14th Gen hybrid cores vs older monolithic cores)
-- **Discrete graphics series & dedicated VRAM** (RTX 40/50 series vs integrated Iris Xe/UHD)
-- **Memory & high-speed storage capacities** (RAM bandwidth, NVMe SSD sizing)
-- **Display specifications** (Screen size, pixel density PPI, aspect ratio)
-- **Physical condition & elapsed age** (Battery wear, cosmetic scuffs, screen scratches)
-- **Current retail market conditions in India (INR ₹)**
+Consumers purchasing used or out-of-warranty laptops face severe information asymmetry regarding both price and repairability:
+1. **Valuation Uncertainty:** Laptop price depends on complex, interacting factors (CPU family/cores, dedicated GPU VRAM, RAM, NVMe speed, PPI, display quality, physical wear, and battery wear).
+2. **Diagnostic Uncertainty:** When a laptop malfunctions, consumers lack technical knowledge and bench diagnostic instrumentation, making them vulnerable to misdiagnosis or unnecessary board replacements.
+3. **Repair Cost Opacity:** Hardware repair quotations in India vary wildly across unauthorized independent shops, official service centres, and major tech hubs (Nehru Place, SP Road, Lamington Road).
+4. **Repair-vs-Replace Dilemma:** Consumers struggle to determine whether investing ₹5,000–₹15,000 into repairing an aging device is economically rational or a sunk-cost trap.
 
-**FAIRFIX** provides a research-backed, machine learning platform that:
-1. Estimates a laptop's fair new retail replacement value using modern Indian market listings.
-2. Applies an econometric, literature-backed depreciation heuristic for second-hand wear (Türkolmez et al. 2024).
-3. Compares a seller's asking price against the fair valuation to flag **Great Deals**, **Fair Prices**, or **Overpriced Listings**.
-4. Provides transparent feature explainability using **SHAP (SHapley Additive exPlanations)** to show the exact rupee impact of every component.
+**FAIRFIX** provides a unified, research-backed software platform that delivers:
+- **Laptop Valuation:** Estimates fair market value using genuine Gradient Boosting regression ($R^2 = 0.9307$, $\text{MAE} = \text{₹}11,230$) with literature-backed depreciation heuristics.
+- **Repair Diagnosis:** Predicts candidate hardware/software root causes using a Calibrated Linear SVC NLP classifier trained on 3,500+ Open Repair Alliance records across 17 empirical categories.
+- **Repair Cost Intelligence:** Queries verified Indian market parts and labour price ranges in INR.
+- **Quote Evaluation:** Audits technician quotes against market benchmarks, calculating rupee variance and percentage markup.
+- **Repair-versus-Replace Decision Support:** Analyzes the Repair-to-Value ratio to provide actionable, mathematically justified financial recommendations.
 
 ---
 
