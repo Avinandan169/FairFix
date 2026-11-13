@@ -659,5 +659,52 @@
       "bugged device",
       "bugged"
     ]
+  },
+  "leakage_and_generalization_audit": {
+    "standard_held_out_test": {
+      "description": "Stratified 80/20 train/test split (random_state=42) preserving real-world community log distribution",
+      "sample_count": 481,
+      "accuracy": 0.7235,
+      "macro_f1": 0.6836,
+      "weighted_f1": 0.7237,
+      "macro_precision": 0.7359,
+      "macro_recall": 0.6655
+    },
+    "verbatim_duplicate_leakage_analysis": {
+      "description": "Held-out test split with verbatim duplicate descriptions from training set excluded",
+      "total_test_samples": 481,
+      "verbatim_duplicated_test_samples": 81,
+      "novel_test_samples": 400,
+      "accuracy_on_novel_descriptions": 0.675,
+      "macro_f1_on_novel_descriptions": 0.6456,
+      "accuracy_on_duplicated_descriptions": 0.963,
+      "optimistic_bias_pct": 4.85,
+      "methodological_note": "Short fixer shorthand (e.g., \"broken lcd\", \"battery replaced\") repeats across repair cafe events. Note: this subset is not guaranteed fully leakage-free due to possible syntactic paraphrases."
+    },
+    "grouped_near_duplicate_cross_validation": {
+      "description": "5-Fold GroupKFold cross-validation on 1,991 normalized text clusters (Jaccard token similarity >= 0.80)",
+      "total_samples": 2404,
+      "num_clusters": 1991,
+      "n_splits": 5,
+      "cv_group_accuracy_mean": 0.725,
+      "cv_group_accuracy_std": 0.0181,
+      "cv_group_macro_f1_mean": 0.6797,
+      "cv_group_macro_f1_std": 0.0142,
+      "fold_accuracies": [
+        0.7277,
+        0.7006,
+        0.7547,
+        0.7131,
+        0.7292
+      ],
+      "fold_macro_f1s": [
+        0.6662,
+        0.6918,
+        0.7008,
+        0.6741,
+        0.6655
+      ],
+      "methodological_conclusion": "When clusters of exact and near-duplicate descriptions are strictly held out together in out-of-fold validation, model generalizes at 72.50% mean accuracy across the full 2,404 dataset."
+    }
   }
 }

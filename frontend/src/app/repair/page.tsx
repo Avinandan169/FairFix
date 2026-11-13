@@ -221,15 +221,15 @@ export default function RepairIntelligencePage() {
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-700/50 text-xs font-semibold text-cyan-400 mb-3">
                 <Sparkles className="h-3.5 w-3.5" />
-                Supervised NLP Diagnosis + Indian Market Pricing Intelligence
+                Supervised NLP Diagnosis + Illustrative Repair Cost Benchmarks
               </div>
               <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
-                Repair Intelligence & Valuation Hub
+                Repair Intelligence & Decision Hub
               </h1>
               <p className="mt-2 text-base text-slate-400 max-w-3xl">
-                Diagnose laptop faults using real-world community repair telemetry, inspect verified Indian parts and labour
-                benchmarks (Nehru Place, SP Road, Lamington Road), evaluate technician quotes, and determine whether repairing
-                or replacing is economically sound.
+                Diagnose laptop faults using real-world community repair telemetry (Open Repair Alliance), inspect illustrative
+                reference estimates for components and labour, evaluate technician quotes against heuristic ranges, and evaluate
+                repair-versus-replace feasibility with configurable economic thresholds.
               </p>
             </div>
 
@@ -244,7 +244,7 @@ export default function RepairIntelligencePage() {
               </div>
               <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 text-center">
                 <span className="block text-xl font-bold text-amber-400">33</span>
-                <span className="text-[11px] text-slate-400">Verified Benchmarks</span>
+                <span className="text-[11px] text-slate-400">Illustrative Benchmarks</span>
               </div>
             </div>
           </div>
@@ -487,16 +487,23 @@ export default function RepairIntelligencePage() {
               </div>
               <div>
                 <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  2. Indian Repair Cost Intelligence
+                  2. Illustrative Repair Cost Reference Catalogue
                   <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-800">
-                    Nehru Place / SP Road / Cashify
+                    Expert Heuristic Estimates
                   </span>
                 </h2>
                 <p className="text-xs text-slate-400">
-                  Inspect verified benchmark ranges for genuine parts and independent technician labour in INR.
+                  Inspect illustrative reference ranges for replacement components and independent technician labour in INR (unverified independently).
                 </p>
               </div>
             </div>
+          </div>
+
+          <div className="mt-4 p-3.5 rounded-xl bg-amber-950/40 border border-amber-800/60 text-amber-200/90 text-xs flex items-start gap-2.5">
+            <Info className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+            <span>
+              <strong>Provenance Disclaimer:</strong> All component part and technician labour figures displayed in this reference catalogue are illustrative heuristic estimates synthesized from general IT market observations (Nehru Place, SP Road, Lamington Road). They are not independently verified market quotations, authorized manufacturer rate cards, or binding commercial estimates.
+            </span>
           </div>
 
           <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -622,10 +629,10 @@ export default function RepairIntelligencePage() {
                 <div className="rounded-xl border border-slate-800 overflow-hidden bg-slate-950">
                   <div className="p-3 bg-slate-900/80 border-b border-slate-800 flex items-center justify-between">
                     <span className="text-xs font-semibold text-slate-300">
-                      Representative Market Survey Records ({pricingEstimate.representative_matches.length})
+                      Illustrative Heuristic Reference Records ({pricingEstimate.representative_matches.length}) — Unverified Independently
                     </span>
                     <span className="text-[11px] text-slate-400">
-                      Location: {pricingEstimate.market_location}
+                      Contextual IT Hub: {pricingEstimate.market_location}
                     </span>
                   </div>
                   <div className="overflow-x-auto">
@@ -685,10 +692,17 @@ export default function RepairIntelligencePage() {
                   </span>
                 </h2>
                 <p className="text-xs text-slate-400">
-                  Compare any technician quotation against independent market rates to uncover overpricing or suspicious discounts.
+                  Compare any technician quotation against illustrative heuristic benchmarks to uncover overpricing or suspicious discounts.
                 </p>
               </div>
             </div>
+          </div>
+
+          <div className="mt-4 p-3 rounded-xl bg-purple-950/40 border border-purple-800/60 text-purple-200/90 text-xs flex items-start gap-2.5">
+            <Info className="h-4 w-4 text-purple-400 shrink-0 mt-0.5" />
+            <span>
+              <strong>Quote Audit Guidance:</strong> This tool compares technician pricing against illustrative heuristic reference benchmarks to assist in consumer negotiation and awareness. It is not an authoritative commercial appraisal.
+            </span>
           </div>
 
           <form onSubmit={handleEvaluateQuote} className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -857,14 +871,21 @@ export default function RepairIntelligencePage() {
                 <h2 className="text-xl font-bold text-white flex items-center gap-2">
                   4. Repair-versus-Replace Decision Engine
                   <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800">
-                    Economic ROI Optimizer
+                    Configurable Decision Heuristics
                   </span>
                 </h2>
                 <p className="text-xs text-slate-400">
-                  Synthesize the ML laptop market valuation with repair costs to compute the Repair-to-Value ratio and get an objective decision.
+                  Synthesize laptop valuation with estimated repair costs using configurable heuristic thresholds (30% / 50% Rule).
                 </p>
               </div>
             </div>
+          </div>
+
+          <div className="mt-4 p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-800/60 text-emerald-200/90 text-xs flex items-start gap-2.5">
+            <Info className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
+            <span>
+              <strong>Decision Engine Notice:</strong> The 30% and 50% repair-to-value thresholds are heuristic decision rules derived from consumer electronics life-cycle literature. Actual repair economics depend on physical device condition, internal wear, replacement part authenticity, technician warranty duration, and user workflow needs. This output does not constitute definitive financial advice.
+            </span>
           </div>
 
           <form onSubmit={handleDecisionAnalysis} className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

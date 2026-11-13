@@ -135,7 +135,12 @@ class QuoteEvaluationService:
             "market_location": benchmark["market_location"],
             "primary_source": benchmark["primary_source"],
             "explanation": explanation,
-            "suggested_questions": technician_questions
+            "suggested_questions": technician_questions,
+            "is_heuristic": True,
+            "disclaimer": (
+                "Quote evaluation compares technician pricing against an illustrative heuristic benchmark. "
+                "It serves as a consumer negotiation and awareness guide, not as an authoritative or legally binding commercial appraisal."
+            )
         }
 
 

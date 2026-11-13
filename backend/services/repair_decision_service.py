@@ -146,10 +146,17 @@ class RepairDecisionService:
             "badge_color": badge_color,
             "repair_cost_ratio": round(repair_ratio, 4),
             "repair_cost_ratio_pct": repair_ratio_pct,
+            "threshold_basis": "Configurable Consumer Economics Heuristic (30% / 50% Rule)",
+            "is_heuristic": True,
             "economic_summary": summary,
             "decision_factors": key_factors,
             "financial_breakdown": financial_comparison,
-            "valuation_source": "FairFix ML Valuation Pipeline" if laptop_specs else "User-Provided Market Value"
+            "valuation_source": "FairFix ML Valuation Pipeline" if laptop_specs else "User-Provided Market Value",
+            "disclaimer": (
+                "This assessment is a configurable heuristic decision-support guideline based on the repair-to-value ratio. "
+                "Actual repair economics depend on physical device condition, replacement component quality, technician warranty duration, "
+                "expected remaining lifespan, and new replacement outlay. It does not constitute a certified or definitive financial recommendation."
+            )
         }
 
 

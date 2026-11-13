@@ -125,8 +125,8 @@ export default function HomePage() {
           </div>
           <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80">
             <div className="text-2xl font-bold text-amber-400 font-mono">33 Benchmarks</div>
-            <div className="text-xs text-slate-400 font-medium">Verified Price Records</div>
-            <div className="text-[11px] text-slate-500">Nehru Place / SP Road / Cashify</div>
+            <div className="text-xs text-slate-400 font-medium">Illustrative Records</div>
+            <div className="text-[11px] text-slate-500">Heuristic Reference Estimates</div>
           </div>
         </div>
       </section>
@@ -194,7 +194,7 @@ export default function HomePage() {
               </div>
             </div>
             <p className="text-sm text-slate-400 leading-relaxed">
-              Calibrated text classifier trained on 3,500+ Open Repair Alliance records isolates hardware faults from symptoms. Verified Indian market pricing catalogue audits technician quotes and calculates Repair-to-Value ratios.
+              Calibrated text classifier trained on 3,500+ Open Repair Alliance records isolates hardware faults from symptoms. Illustrative Indian repair cost catalogue audits technician quotes and evaluates Repair-to-Value ratios using configurable heuristics.
             </p>
             <ul className="space-y-2 text-xs text-slate-300">
               <li className="flex items-center gap-2">
@@ -203,11 +203,11 @@ export default function HomePage() {
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-amber-400" />
-                <span>Verified parts & labour ranges (Nehru Place, SP Road)</span>
+                <span>Illustrative heuristic parts & labour ranges (Nehru Place, SP Road)</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-amber-400" />
-                <span>Repair-vs-Replace economic optimizer (30% / 50% ratio rules)</span>
+                <span>Configurable decision heuristics (30% / 50% economic rule)</span>
               </li>
             </ul>
             <div className="pt-2">

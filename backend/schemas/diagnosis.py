@@ -47,12 +47,15 @@ class RepairPricingEstimateResponse(BaseModel):
     found: bool
     component: Optional[str] = None
     currency: Optional[str] = "INR"
+    is_heuristic: Optional[bool] = True
+    catalogue_classification: Optional[str] = None
     part_cost_range: Optional[RepairCostRange] = None
     labour_cost_range: Optional[RepairCostRange] = None
     total_estimated_range: Optional[RepairCostRange] = None
     representative_matches: Optional[List[Dict[str, Any]]] = None
     primary_source: Optional[str] = None
     market_location: Optional[str] = None
+    disclaimer: Optional[str] = None
     message: Optional[str] = None
 
 
@@ -78,6 +81,8 @@ class QuoteEvaluationResponse(BaseModel):
     primary_source: Optional[str] = None
     explanation: Optional[str] = None
     suggested_questions: Optional[List[str]] = None
+    is_heuristic: Optional[bool] = True
+    disclaimer: Optional[str] = None
     message: Optional[str] = None
 
 
@@ -97,8 +102,11 @@ class RepairDecisionResponse(BaseModel):
     badge_color: Optional[str] = None
     repair_cost_ratio: Optional[float] = None
     repair_cost_ratio_pct: Optional[float] = None
+    threshold_basis: Optional[str] = None
+    is_heuristic: Optional[bool] = True
     economic_summary: Optional[str] = None
     decision_factors: Optional[List[str]] = None
     financial_breakdown: Optional[Dict[str, Any]] = None
     valuation_source: Optional[str] = None
+    disclaimer: Optional[str] = None
     error: Optional[str] = None

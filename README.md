@@ -3,14 +3,14 @@
 > **Independent Repair & Price Intelligence for Electronics**  
 > *B.Tech Computer Science and Engineering Project*  
 > **Central Product Promise:** *"Understand what your device is worth, what it might cost to fix, and whether the deal is actually fair."*  
-> **Status:** Fully Trained ML Valuation Pipeline + Supervised Repair Fault Classifier + Verifiable Pricing Catalogue + Full-Stack Next.js 15 Interface  
+> **Status:** Fully Trained ML Valuation Pipeline + Supervised NLP Fault Classifier + Illustrative Heuristic Pricing Catalogue + Full-Stack Next.js 15 Interface  
 
 [![Python](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-1.1.0-009688.svg)](https://fastapi.tiangolo.com/)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black.svg)](https://nextjs.org/)
 [![Valuation R²](https://img.shields.io/badge/Valuation_Test_R²-0.9307-success.svg)](#4-empirical-machine-learning-benchmark)
-[![Diagnosis Accuracy](https://img.shields.io/badge/Diagnosis_Accuracy-72.35%25-cyan.svg)](#5-repair-intelligence--fault-diagnosis-telemetry)
-[![Pricing Benchmarks](https://img.shields.io/badge/Verified_Benchmarks-33_Records-amber.svg)](#6-indian-repair-cost-intelligence)
+[![Diagnosis Accuracy](https://img.shields.io/badge/Diagnosis_Accuracy-72.35%25_(Test)_|_72.50%25_(GroupKFold)-cyan.svg)](#5-repair-intelligence--fault-diagnosis-telemetry)
+[![Pricing Catalogue](https://img.shields.io/badge/Pricing_Catalogue-Heuristic_Reference_(33_Records)-amber.svg)](#6-indian-repair-cost-intelligence)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
@@ -24,19 +24,21 @@ Consumers purchasing used or out-of-warranty laptops face severe information asy
 4. **Repair-vs-Replace Dilemma:** Consumers struggle to determine whether investing ₹5,000–₹15,000 into repairing an aging device is economically rational or a sunk-cost trap.
 
 **FAIRFIX** provides a unified, research-backed software platform that delivers:
-- **Laptop Valuation:** Estimates fair market value using genuine Gradient Boosting regression ($R^2 = 0.9307$, $\text{MAE} = \text{₹}11,230$) with literature-backed depreciation heuristics.
-- **Repair Diagnosis:** Predicts candidate hardware/software root causes using a Calibrated Linear SVC NLP classifier trained on 3,500+ Open Repair Alliance records across 17 empirical categories.
-- **Repair Cost Intelligence:** Queries verified Indian market parts and labour price ranges in INR.
-- **Quote Evaluation:** Audits technician quotes against market benchmarks, calculating rupee variance and percentage markup.
-- **Repair-versus-Replace Decision Support:** Analyzes the Repair-to-Value ratio to provide actionable, mathematically justified financial recommendations.
+- **Laptop Valuation:** Estimates retail baseline and depreciated market value using genuine Gradient Boosting regression ($R^2 = 0.9307$, $\text{MAE} = \text{₹}11,230$) with literature-backed econometric depreciation heuristics (Türkolmez et al. 2024).
+- **Repair Diagnosis:** Predicts candidate hardware/software root causes using a Calibrated Linear SVC NLP classifier trained on 2,404 curated Open Repair Alliance records across 17 empirical categories.
+- **Repair Cost Intelligence:** Queries an illustrative heuristic reference catalogue of Indian parts and labour price ranges in INR, accompanied by clear provenance disclaimers.
+- **Quote Evaluation:** Audits technician quotes against heuristic reference benchmarks, calculating rupee variance and percentage markup.
+- **Repair-versus-Replace Decision Support:** Analyzes the Repair-to-Value ratio using configurable 30% / 50% economic thresholds to provide actionable financial recommendations.
 
 ---
 
 ## 2. Key Methodological Contributions
 
-- **Strict Academic Integrity (No Fabricated Metrics):** All evaluation metrics are generated from genuinely trained models on held-out test splits.
+- **Strict Academic Integrity (No Fabricated Metrics):** All evaluation metrics are generated from genuinely trained models on held-out test splits and verified via reproducible audit scripts.
 - **Explicit Separation of New vs Used Models:** Public training datasets contain new retail listing prices. FairFix strictly separates new retail price prediction from used-device depreciation, explicitly labeling condition adjustments as an **Experimental Literature Heuristic**.
 - **Chassis Anti-Leakage Defense (`GroupKFold`):** In addition to standard 5-Fold cross-validation ($R^2 = 0.9256$), we evaluate via GroupKFold by product chassis line ($R^2 = 0.8738$), proving that sister laptop configurations never leak into validation folds.
+- **NLP Diagnostic Leakage & Robustness Audit:** The fault classification engine is evaluated across three complementary perspectives: the standard held-out test set (72.35% Acc, 0.6836 Macro F1), an exact-duplicate-free subset (67.50% Acc, 0.6456 Macro F1), and a 5-Fold semantic cluster `GroupKFold` cross-validation (72.50% ± 1.8% Acc, 0.6797 ± 0.014 Macro F1) across 1,991 disjoint symptom clusters.
+- **Transparent Pricing Provenance:** The 33-record repair pricing catalogue is explicitly classified as an *Illustrative Repair Cost Reference Catalogue — Expert Heuristic Estimates*. A full audit showed 0/33 URLs independently verified (15 synthetic domain placeholders, 16 expired links, 2 unverified aggregators); all endpoints and UI views include prominent provenance disclaimers.
 - **Anti-Merge Discipline:** Incompatible foreign datasets (EUR, USD) from older hardware generations (2017) were not naively merged with the 2024 Indian market dataset, preventing artificial purchasing power parity (PPP) and temporal distortion.
 
 ---
@@ -177,7 +179,7 @@ PYTHONPATH=. python ml/training/train.py
 
 ### 6.3 Run Automated Integration Tests
 ```bash
-PYTHONPATH=. pytest tests/test_api.py -v
+PYTHONPATH=. pytest tests/ -v
 ```
 
 ### 6.4 Launch the Backend API

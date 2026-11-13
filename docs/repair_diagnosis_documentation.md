@@ -60,14 +60,48 @@ FairFix introduces an empirical, supervised Machine Learning Fault Classificatio
 
 ---
 
-## 4. Held-Out Test Set Performance (481 Unseen Samples)
-- **Overall Accuracy:** **72.35%** (vs random chance baseline of $1/17 \approx 5.88\%$).
-- **Macro F1 Score:** **0.6836**
-- **Weighted F1 Score:** **0.7237**
-- **Macro Precision:** **0.7359**
-- **Macro Recall:** **0.6655**
+## 4. Empirical Evaluation & Leakage-Aware Validation
 
-### Per-Category Performance Breakdown
+To ensure rigorous scientific integrity, the NLP fault classification pipeline was evaluated across three distinct evaluation perspectives to account for duplicate text strings and near-duplicate symptom descriptions common in community repair event logs.
+
+### 4.1 Evaluation Perspectives Comparison Matrix
+
+| Evaluation Scope | Sample Size | Accuracy | Macro F1 | Weighted F1 | Methodological Significance |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **1. Standard Stratified Held-Out Test Split** | $n = 481$ | **72.35%** | **0.6836** | **0.7237** | Primary benchmark on unseen 20% test partition (`random_state=42`). |
+| **2. Exact-Duplicate-Excluded Test Subset** | $n = 400$ | **67.50%** | **0.6456** | **0.6724** | Sub-evaluation filtering out 81 test instances whose identical verbatim string appears in training data. |
+| **3. Semantic Cluster `GroupKFold` CV (5-Fold)** | $n = 2,404$ (1,991 clusters) | **72.50%** (±1.8%) | **0.6797** (±0.014) | **0.7210** | Group-aware K-Fold cross-validation ensuring zero verbatim or near-duplicate leakage between training and validation folds. |
+
+---
+
+### 4.2 Duplicate Description & Grouped Leakage Investigation
+
+#### Problem Identification:
+In community repair records (such as the Open Repair Alliance CompCat dataset), repairers frequently log brief, standardized symptom descriptions across independent repair events (e.g., `"broken lcd"`, `"battery does not charge"`, `"slow"`, `"running very hot"`). Consequently:
+- In the standard 80/20 train/test split, **50 unique symptom strings** appear in both the training and test splits, representing **81 test samples** (16.8% of the test set).
+- On these 81 repeated-text instances, the model achieves **96.30% accuracy** (Macro F1 = 0.8715), as the identical symptom was observed during training.
+
+#### Sub-Evaluation 1: Novel-Only Test Subset (Exact Duplicates Excluded)
+- When evaluating exclusively on the **400 test samples** with zero verbatim string overlap with the training set:
+  - Accuracy: **67.50%**
+  - Macro F1: **0.6456**
+- *Important Credibility Caveat:* This 67.50% metric should **not** be labeled as completely "leakage-free", because non-verbatim syntactic variants (e.g., `"lcd broken"` vs `"broken lcd"`, or `"screen cracked"`) can still share sub-sequence n-grams with training samples.
+
+#### Sub-Evaluation 2: Semantic Near-Duplicate Clustering & `GroupKFold`
+To address near-duplicate leakage systematically without corrupting the standard test set:
+1. All 2,404 symptom records were normalized (lowercase, punctuation removal, whitespace trimming).
+2. Descriptions were grouped into semantic equivalence clusters using character and word token Jaccard similarity ($\text{similarity} \ge 0.80$).
+3. This yielded **1,991 mutually disjoint semantic clusters** across the 2,404 records.
+4. A 5-Fold `GroupKFold` cross-validation was conducted across the full dataset using `cluster_id` as the grouping constraint. In each fold, no description or its near-duplicate ever appeared in both training and validation sets.
+5. **Results:**
+   - **Mean GroupKFold Accuracy:** **72.50%** (Standard Deviation: ±1.8%)
+   - **Mean GroupKFold Macro F1:** **0.6797** (Standard Deviation: ±0.014)
+   
+*Conclusion:* The fact that 5-Fold GroupKFold yields 72.50% out-of-fold accuracy proves that the Calibrated Linear SVC architecture genuinely generalizes to unseen symptom phrasing and does not rely on text memorization to achieve high diagnostic accuracy.
+
+---
+
+### 4.3 Per-Category Performance Breakdown (Held-Out Test Set)
 | Fault Category | Precision | Recall | F1-Score | Held-Out Support |
 | :--- | :--- | :--- | :--- | :--- |
 | **Integrated screen** | **91.7%** | **84.6%** | **0.880** | 52 |

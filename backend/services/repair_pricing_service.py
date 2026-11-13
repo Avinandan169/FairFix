@@ -111,6 +111,8 @@ class RepairPricingService:
             "found": True,
             "component": component,
             "currency": "INR",
+            "is_heuristic": True,
+            "catalogue_classification": "Illustrative Repair Cost Reference Catalogue — Expert Heuristic Estimates",
             "part_cost_range": {
                 "min": part_min,
                 "max": part_max
@@ -124,8 +126,13 @@ class RepairPricingService:
                 "max": total_max
             },
             "representative_matches": records_info,
-            "primary_source": records_info[0]["source_name"] if records_info else "Indian Independent Repair Survey",
-            "market_location": records_info[0]["market_location"] if records_info else "Major Indian IT Hubs"
+            "primary_source": records_info[0]["source_name"] if records_info else "Contextual Market Reference",
+            "market_location": records_info[0]["market_location"] if records_info else "Contextual IT Hub Benchmarks",
+            "disclaimer": (
+                "These cost figures are illustrative heuristic benchmarks, not independently verified "
+                "or binding market quotations. Actual parts and labour costs vary by shop, component grade, "
+                "warranty duration, and technician skill."
+            )
         }
 
 

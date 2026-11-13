@@ -537,6 +537,64 @@ export default function DashboardPage() {
                 </div>
               </div>
 
+              {/* Leakage & Generalization Robustness Matrix */}
+              <div className="rounded-2xl bg-slate-900/60 border border-slate-800 overflow-hidden">
+                <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-bold text-white">
+                      Data Science Leakage Audit & Generalization Robustness Matrix
+                    </h3>
+                    <p className="text-xs text-slate-400">
+                      Transparently reporting model accuracy under standard held-out split, verbatim duplicate exclusion, and cluster GroupKFold.
+                    </p>
+                  </div>
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-950 border border-blue-800 text-blue-400 font-semibold">
+                    Academic Transparency Audit
+                  </span>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs font-mono">
+                    <thead className="bg-slate-950 text-slate-400 border-b border-slate-800">
+                      <tr>
+                        <th className="p-3 font-semibold">Evaluation Perspective</th>
+                        <th className="p-3 font-semibold">Sample Scope</th>
+                        <th className="p-3 font-semibold">Accuracy</th>
+                        <th className="p-3 font-semibold">Macro F1</th>
+                        <th className="p-3 font-semibold font-sans">Methodological Significance</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/60 text-slate-300">
+                      <tr className="hover:bg-slate-800/30">
+                        <td className="p-3 font-sans font-medium text-white">Standard Held-Out Test Split</td>
+                        <td className="p-3 text-slate-400">481 held-out test records</td>
+                        <td className="p-3 text-emerald-400 font-bold">72.35%</td>
+                        <td className="p-3 text-cyan-300 font-bold">0.6836</td>
+                        <td className="p-3 font-sans text-slate-400">Stratified random split preserving real-world community log distribution.</td>
+                      </tr>
+                      <tr className="hover:bg-slate-800/30">
+                        <td className="p-3 font-sans font-medium text-white">Exact-Duplicate-Excluded Subset</td>
+                        <td className="p-3 text-slate-400">400 novel descriptions</td>
+                        <td className="p-3 text-amber-400 font-bold">67.50%</td>
+                        <td className="p-3 text-blue-300 font-bold">0.6456</td>
+                        <td className="p-3 font-sans text-slate-400">Excludes 81 test instances sharing verbatim shorthand text with training split.</td>
+                      </tr>
+                      <tr className="bg-cyan-950/20 hover:bg-cyan-950/30">
+                        <td className="p-3 font-sans font-medium text-white">GroupKFold (Near-Duplicate Isolated)</td>
+                        <td className="p-3 text-slate-400">1,991 text clusters (2,404 total)</td>
+                        <td className="p-3 text-emerald-400 font-bold">72.50% ± 1.8%</td>
+                        <td className="p-3 text-cyan-300 font-bold">0.6797 ± 0.014</td>
+                        <td className="p-3 font-sans text-slate-300">5-Fold GroupKFold strictly isolating normalized & near-duplicate clusters.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="p-3.5 bg-slate-950/80 border-t border-slate-800 text-[11px] text-slate-400 leading-relaxed">
+                  <strong>Academic Disclosure:</strong> In community repair records, short fixer descriptions (e.g. <em>&quot;broken lcd&quot;</em>, <em>&quot;battery replaced&quot;</em>, <em>&quot;slow&quot;</em>) naturally repeat across independent repair events. When evaluating strictly on novel phrasing (400 samples), accuracy is 67.50% (~11.5× better than the 5.88% random baseline). When conducting 5-Fold GroupKFold on 1,991 normalized clusters across the entire 2,404 dataset, out-of-fold generalization stabilizes at 72.50%.
+                </div>
+              </div>
+
               {/* Per-Class Metrics Table */}
               <div className="rounded-2xl bg-slate-900/60 border border-slate-800 overflow-hidden">
                 <div className="p-4 border-b border-slate-800">
