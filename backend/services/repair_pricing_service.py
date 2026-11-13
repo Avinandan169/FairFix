@@ -64,6 +64,11 @@ class RepairPricingService:
             comp_match = filtered[filtered["component"].str.lower() == component.strip().lower()]
             if not comp_match.empty:
                 filtered = comp_match
+            else:
+                return {
+                    "found": False,
+                    "message": f"No pricing benchmark found for component '{component}'."
+                }
 
         if len(filtered) > 1 and brand and brand.lower() != "universal":
             brand_match = filtered[filtered["laptop_brand"].str.lower() == brand.strip().lower()]

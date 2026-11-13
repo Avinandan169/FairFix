@@ -212,3 +212,32 @@ def test_repair_decision_with_laptop_specs():
     assert data["success"] is True
     assert data["financial_breakdown"]["device_market_value_inr"] > 35000
     assert data["verdict"] == "REPAIR_RECOMMENDED"
+
+
+def test_repair_estimate_unknown_component():
+    """Verify /repair/estimate returns found: False when component is not in catalogue."""
+    payload = {
+        "component": "Nonexistent Hardware Part",
+        "repair_type": "Replacement"
+    }
+    response = client.post("/repair/estimate", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["found"] is False
+    assert "No pricing benchmark found" in data["message"]
+
+
+def test_repair_decision_invalid_inputs():
+    """Verify /repair/decision rejects non-positive market value or repair cost."""
+    # Zero market value
+    res_zero = client.post("/repair/decision", json={"repair_cost": 3000, "device_market_value": 0})
+    assert res_zero.status_code == 422
+
+    # Negative repair cost
+    res_neg = client.post("/repair/decision", json={"repair_cost": -500, "device_market_value": 40000})
+    assert res_neg.status_code == 422
+
+    # Missing both market value and specs
+    res_missing = client.post("/repair/decision", json={"repair_cost": 3000})
+    assert res_missing.status_code == 400
+    assert "Valid device market value or laptop specification payload required" in res_missing.json()["detail"]

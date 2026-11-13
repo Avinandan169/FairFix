@@ -575,6 +575,12 @@ export default function RepairIntelligencePage() {
             </div>
           )}
 
+          {pricingEstimate && !pricingEstimate.found && (
+            <div className="mt-4 p-4 rounded-xl bg-amber-950/60 border border-amber-800 text-amber-200 text-xs">
+              {pricingEstimate.message || 'No pricing benchmark found for this component.'}
+            </div>
+          )}
+
           {/* Pricing Benchmark Display */}
           {pricingEstimate && pricingEstimate.found && (
             <div className="mt-6 pt-6 border-t border-slate-800 space-y-6">
