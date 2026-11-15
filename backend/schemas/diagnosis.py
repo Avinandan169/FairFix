@@ -14,8 +14,13 @@ class DiagnosisRequest(BaseModel):
 
 class AlternativeFault(BaseModel):
     fault_type: str
-    confidence_score: float
-    confidence_percentage: float
+    confidence_score: float = 0.0
+    confidence_percentage: float = 0.0
+    relevance_score: Optional[int] = Field(None, description="Dynamic heuristic symptom relevance score (0-100)")
+    relevance_level: Optional[str] = Field(None, description="Qualitative relevance tier: High, Moderate, Low")
+    explanation: Optional[str] = Field(None, description="Domain explanation of why this factor may be relevant")
+    matched_symptoms: Optional[List[str]] = Field(default_factory=list, description="Specific symptom keywords matching this factor")
+    is_heuristic: Optional[bool] = Field(True, description="Flag indicating score is a heuristic relevance score, not a probability")
 
 
 class DiagnosisResponse(BaseModel):

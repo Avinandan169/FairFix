@@ -165,6 +165,11 @@ export interface AlternativeFault {
   fault_type: string;
   confidence_score: number;
   confidence_percentage: number;
+  relevance_score?: number;
+  relevance_level?: 'High' | 'Moderate' | 'Low';
+  explanation?: string;
+  matched_symptoms?: string[];
+  is_heuristic?: boolean;
 }
 
 export interface DiagnosisResponse {

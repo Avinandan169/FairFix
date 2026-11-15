@@ -101,6 +101,84 @@ DIAGNOSTIC_CHECKS = {
     ]
 }
 
+# Domain symptom keywords for secondary contributing factor evidence grounding
+FACTOR_KEYWORDS = {
+    "Operating system": [
+        "reboot", "rebooting", "restart", "restarting", "blue screen", "bsod", "crash", "crashing",
+        "freeze", "freezing", "windows", "update", "driver", "corrupt", "os", "bootloader", "hang"
+    ],
+    "Overheating": [
+        "hot", "heat", "overheat", "overheating", "burning", "fan", "fans", "spin", "loud",
+        "thermal", "temp", "temperature", "vent", "vents", "paste", "throttling"
+    ],
+    "Power/battery": [
+        "battery", "charge", "charging", "drain", "draining", "plug", "unplug", "adapter",
+        "charger", "power", "die", "dies", "shutdown", "shut down", "discharging"
+    ],
+    "Integrated screen": [
+        "screen", "display", "monitor", "panel", "flicker", "flickering", "black", "blank",
+        "glitch", "lines", "lcd", "hdmi", "dim", "backlight", "crack", "cracked", "lid"
+    ],
+    "Integrated keyboard": [
+        "keyboard", "key", "keys", "type", "typing", "spacebar", "enter", "spill", "liquid",
+        "water", "unresponsive", "stuck key"
+    ],
+    "Ports/slots/connectors": [
+        "port", "ports", "usb", "hdmi", "jack", "type-c", "usbc", "socket", "slot",
+        "connector", "failing", "loose port", "audio jack", "headphone"
+    ],
+    "Internal storage": [
+        "ssd", "nvme", "hard drive", "hdd", "storage", "disk", "slow", "freeze", "freezing",
+        "smart", "sectors", "corruption", "bad sector"
+    ],
+    "Boot": [
+        "boot", "booting", "startup", "start up", "power on", "post", "bios", "uefi",
+        "hang", "stuck on logo", "no boot"
+    ],
+    "Performance": [
+        "slow", "slowly", "lag", "lagging", "sluggish", "freeze", "freezing", "stutter",
+        "heavy", "usage", "freezes", "unresponsive"
+    ],
+    "System board": [
+        "dead", "motherboard", "short", "circuit", "smoke", "burnt", "spark", "no power",
+        "led", "chip", "blown", "soldering"
+    ],
+    "Configuration": [
+        "setting", "settings", "bios", "driver", "wifi", "bluetooth", "resolution", "display settings"
+    ]
+}
+
+# Domain explanations for why each secondary factor is relevant
+FACTOR_EXPLANATIONS = {
+    "Operating system": "System file corruption, failed updates, or driver conflicts can trigger spontaneous reboots, blue screens, or unexpected crashes.",
+    "Overheating": "Excessive internal thermal buildup or clogged cooling fans can force emergency thermal shutdowns or display glitches under heavy loads.",
+    "Power/battery": "Degraded Li-ion cells or unstable charging rail delivery can cause sudden power loss or erratic component operation.",
+    "Integrated screen": "A damaged panel, loose eDP ribbon cable, or failing backlight inverter can cause flickering, horizontal lines, or no video.",
+    "Integrated keyboard": "Physical membrane switch wear, cracked ribbon traces, or liquid residue can disable key rows or individual switches.",
+    "Ports/slots/connectors": "Worn contact pins, debris, or fractured motherboard solder joints on ports can interrupt peripheral communication and charging.",
+    "Internal storage": "Failing SSD/HDD storage blocks or partition table corruption can cause severe system hangs, slow responsiveness, or boot failures.",
+    "Boot": "Corrupted UEFI/BIOS firmware or bootloader sequence failures can prevent the system from completing Power-On Self-Test (POST).",
+    "Performance": "Excessive background processes, thermal throttling, or low available memory can cause sluggishness and intermittent freezing.",
+    "System board": "Component-level failures on power rails or charging ICs can disrupt power distribution across multiple attached subsystems.",
+    "Configuration": "Misconfigured display outputs, device drivers, or power management profiles can mimic physical hardware malfunctions."
+}
+
+# Domain co-occurrence interactions (primary_fault, secondary_fault) -> interaction bonus points
+DOMAIN_INTERACTIONS = {
+    ("Integrated screen", "Operating system"): 10,
+    ("Integrated screen", "System board"): 10,
+    ("Power/battery", "Overheating"): 15,
+    ("Overheating", "Power/battery"): 15,
+    ("Performance", "Internal storage"): 15,
+    ("Performance", "Operating system"): 10,
+    ("Ports/slots/connectors", "Integrated keyboard"): 15,
+    ("Integrated keyboard", "Ports/slots/connectors"): 15,
+    ("Power/battery", "Integrated screen"): 10,
+    ("Integrated screen", "Power/battery"): 10,
+    ("Boot", "Operating system"): 15,
+    ("Boot", "Internal storage"): 10,
+}
+
 
 class FaultDiagnosisEngine:
     """Supervised ML Fault Diagnosis and Triage inference engine."""
@@ -136,6 +214,74 @@ class FaultDiagnosisEngine:
             return found_keywords[:6]
         except Exception:
             return []
+
+    def calculate_possible_factors(self, symptom_text: str, primary_fault: str, probas_dict: dict) -> list[dict]:
+        """
+        Dynamically calculates secondary possible contributing factors based on:
+        1. Direct textual evidence in user's reported symptom description.
+        2. Supervised model probability support (gated against prior probability leakage).
+        3. Domain hardware interaction bonuses.
+
+        Filters out categories lacking symptom evidence or scoring below the relevance threshold.
+        """
+        lower_text = symptom_text.lower()
+        factors = []
+
+        for category, keywords in FACTOR_KEYWORDS.items():
+            if category == primary_fault:
+                continue  # Primary suspected fault is already isolated
+
+            # 1. Textual evidence score from symptom description
+            matched_words = [kw for kw in keywords if re.search(r'\b' + re.escape(kw) + r'\b', lower_text)]
+            if len(matched_words) >= 2:
+                evidence_score = 45
+            elif len(matched_words) == 1:
+                evidence_score = 30
+            else:
+                evidence_score = 0
+
+            # 2. Model probability support (scaled 0-35 points)
+            model_prob = probas_dict.get(category, 0.0)
+            # Suppress class prior background leakage if no symptom keywords matched
+            if evidence_score == 0 and model_prob < 0.12:
+                model_score = 0
+            else:
+                model_score = min(35, int(model_prob * 70))
+
+            # 3. Domain Interaction Bonus
+            interaction_bonus = DOMAIN_INTERACTIONS.get((primary_fault, category), 0)
+            if evidence_score == 0 and model_score == 0:
+                interaction_bonus = 0
+
+            total_score = min(90, evidence_score + model_score + interaction_bonus)
+
+            # Strict relevance gating: Must achieve at least 25 relevance points
+            if total_score >= 25:
+                if total_score >= 55:
+                    level = "High"
+                elif total_score >= 38:
+                    level = "Moderate"
+                else:
+                    level = "Low"
+
+                factors.append({
+                    "fault_type": category,
+                    "relevance_score": total_score,
+                    "relevance_level": level,
+                    "explanation": FACTOR_EXPLANATIONS.get(
+                        category,
+                        "May represent an associated secondary or co-occurring subsystem issue."
+                    ),
+                    "matched_symptoms": matched_words,
+                    "is_heuristic": True,
+                    # Backward-compatible fields
+                    "confidence_score": round(float(model_prob), 4),
+                    "confidence_percentage": round(float(model_prob) * 100, 1)
+                })
+
+        # Sort descending by relevance score
+        factors.sort(key=lambda x: x["relevance_score"], reverse=True)
+        return factors[:3]
 
     def diagnose(self, symptom_description: str, brand: str = None) -> dict:
         """
@@ -173,14 +319,11 @@ class FaultDiagnosisEngine:
         top_fault = self.classes[top_idx]
         top_prob = float(probas[top_idx])
 
-        # Top 3 alternatives
-        alternatives = []
-        for idx in sorted_indices[1:4]:
-            alternatives.append({
-                "fault_type": self.classes[idx],
-                "confidence_score": round(float(probas[idx]), 4),
-                "confidence_percentage": round(float(probas[idx]) * 100, 1)
-            })
+        # Map class probabilities dictionary for evidence-grounded scoring
+        probas_dict = {self.classes[i]: float(probas[i]) for i in range(len(self.classes))}
+
+        # Calculate dynamically grounded secondary factors
+        alternatives = self.calculate_possible_factors(cleaned, top_fault, probas_dict)
 
         # Confidence thresholding (35% threshold for 17 classes where random chance is 5.8%)
         is_confident = top_prob >= 0.35
@@ -194,9 +337,10 @@ class FaultDiagnosisEngine:
         ])
 
         if not is_confident:
+            alt_mention = f", closely followed by '{alternatives[0]['fault_type']}'" if alternatives else ""
             checks = [
                 "Symptoms match multiple possible fault categories. A hands-on hardware inspection is strongly recommended.",
-                f"Top potential category: '{top_fault}' ({round(top_prob * 100, 1)}% likelihood), closely followed by '{alternatives[0]['fault_type']}'.",
+                f"Top potential category: '{top_fault}' ({round(top_prob * 100, 1)}% likelihood){alt_mention}.",
                 "Try running your laptop's built-in UEFI diagnostics (e.g. tap F12 or Esc on startup) to isolate component failure."
             ]
 

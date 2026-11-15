@@ -546,25 +546,83 @@ export default function RepairAssistantPage() {
                 </div>
               )}
 
-              {/* Candidate Failure Categories */}
-              {diagnosisResult.alternatives && diagnosisResult.alternatives.length > 0 && (
-                <div className="space-y-2 pt-1">
-                  <span className="text-xs font-semibold text-slate-700 uppercase tracking-wider block">
-                    Other Potential Contributing Factors
+              {/* Other Possible Factors */}
+              <div className="space-y-3 pt-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-slate-800 uppercase tracking-wider block">
+                    Other Possible Factors
                   </span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    {diagnosisResult.alternatives.slice(0, 4).map((alt, i) => (
-                      <div
-                        key={i}
-                        className="p-3 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center justify-between text-xs"
-                      >
-                        <span className="font-medium text-slate-800">{alt.fault_type}</span>
-                        <span className="text-slate-500 text-[11px]">{alt.confidence_percentage}% Match</span>
-                      </div>
-                    ))}
-                  </div>
+                  <span className="text-[11px] text-slate-400">
+                    Symptom correlation &amp; co-occurrence
+                  </span>
                 </div>
-              )}
+
+                {diagnosisResult.alternatives && diagnosisResult.alternatives.length > 0 ? (
+                  <div className="space-y-2">
+                    <div className="grid grid-cols-1 gap-2.5">
+                      {diagnosisResult.alternatives.slice(0, 3).map((alt, i) => {
+                        const levelColor =
+                          alt.relevance_level === 'High'
+                            ? 'bg-amber-100 text-amber-800 border-amber-200'
+                            : alt.relevance_level === 'Moderate'
+                            ? 'bg-blue-100 text-blue-800 border-blue-200'
+                            : 'bg-slate-100 text-slate-700 border-slate-200';
+
+                        return (
+                          <div
+                            key={i}
+                            className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 space-y-2"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold text-slate-800 text-xs">{alt.fault_type}</span>
+                                {alt.relevance_level && (
+                                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium border ${levelColor}`}>
+                                    {alt.relevance_level} Relevance
+                                  </span>
+                                )}
+                              </div>
+                              <span className="text-slate-600 font-mono text-[11px] font-medium bg-white px-2 py-0.5 rounded border border-slate-200">
+                                {alt.relevance_score !== undefined
+                                  ? `Score: ${alt.relevance_score}/100`
+                                  : `${alt.confidence_percentage}% Match`}
+                              </span>
+                            </div>
+
+                            {alt.explanation && (
+                              <p className="text-[11px] text-slate-600 leading-relaxed">
+                                {alt.explanation}
+                              </p>
+                            )}
+
+                            {alt.matched_symptoms && alt.matched_symptoms.length > 0 && (
+                              <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                                <span className="text-[10px] text-slate-400 uppercase font-medium">Symptom evidence:</span>
+                                {alt.matched_symptoms.map((term, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="text-[10px] bg-slate-200/80 text-slate-700 px-1.5 py-0.5 rounded font-mono"
+                                  >
+                                    &ldquo;{term}&rdquo;
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <p className="text-[10px] text-slate-400 italic">
+                      * Relevance scores (0–100) are heuristic indicators derived from reported symptom keywords and diagnostic subsystem correlation, not independent failure probabilities.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/50 text-[11px] text-slate-500">
+                    No secondary contributing factors detected. The reported symptoms isolated specifically to the primary subsystem without secondary hardware correlations.
+                  </div>
+                )}
+              </div>
 
               {/* Physical Check Disclaimer */}
               <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 text-[11px] text-slate-500 leading-relaxed flex items-start gap-2">

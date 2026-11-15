@@ -241,3 +241,92 @@ def test_repair_decision_invalid_inputs():
     res_missing = client.post("/repair/decision", json={"repair_cost": 3000})
     assert res_missing.status_code == 400
     assert "Valid device market value or laptop specification payload required" in res_missing.json()["detail"]
+
+
+# =====================================================================
+# Tests for Other Possible Factors Dynamic Symptom-Grounded Scoring
+# =====================================================================
+
+def test_possible_factors_dual_symptom():
+    """Verify dual-symptom input grounds secondary factor with evidence and high relevance."""
+    payload = {
+        "symptom_description": "Battery draining quickly and overheating"
+    }
+    response = client.post("/diagnosis/predict", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["primary_fault"] == "Power/battery"
+    assert len(data["alternatives"]) >= 1
+
+    overheat = next((alt for alt in data["alternatives"] if alt["fault_type"] == "Overheating"), None)
+    assert overheat is not None, "Overheating should be identified as a secondary contributing factor"
+    assert overheat["relevance_score"] >= 55
+    assert overheat["relevance_level"] == "High"
+    assert "overheating" in [s.lower() for s in overheat["matched_symptoms"]]
+    assert overheat["is_heuristic"] is True
+    assert "thermal" in overheat["explanation"].lower() or "cooling" in overheat["explanation"].lower()
+
+    # Verify unrelated categories with no symptom evidence are not injected
+    unrelated_faults = [alt["fault_type"] for alt in data["alternatives"]]
+    assert "Operating system" not in unrelated_faults
+    assert "Configuration" not in unrelated_faults
+
+
+def test_possible_factors_compound_keyboard_ports():
+    """Verify compound input captures the secondary physical subsystem accurately."""
+    payload = {
+        "symptom_description": "Keyboard not responding and USB ports failing"
+    }
+    response = client.post("/diagnosis/predict", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["primary_fault"] in ["Ports/slots/connectors", "Integrated keyboard"]
+
+    secondary_fault = "Integrated keyboard" if data["primary_fault"] == "Ports/slots/connectors" else "Ports/slots/connectors"
+    matched_alt = next((alt for alt in data["alternatives"] if alt["fault_type"] == secondary_fault), None)
+    assert matched_alt is not None
+    assert matched_alt["relevance_score"] >= 50
+    assert matched_alt["matched_symptoms"] is not None and len(matched_alt["matched_symptoms"]) > 0
+
+
+def test_possible_factors_isolated_symptom_empty():
+    """Verify single isolated physical symptom does not produce spurious background factors."""
+    payload = {
+        "symptom_description": "My laptop screen has a big crack across the glass"
+    }
+    response = client.post("/diagnosis/predict", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["primary_fault"] == "Integrated screen"
+    # Secondary alternatives should be empty because there is zero evidence for OS/Config/Battery
+    assert len(data["alternatives"]) == 0
+
+
+def test_possible_factors_insufficient_input():
+    """Verify ambiguous or minimal input returns empty alternatives list."""
+    payload = {
+        "symptom_description": "bad"
+    }
+    response = client.post("/diagnosis/predict", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "INSUFFICIENT_INPUT"
+    assert data["alternatives"] == []
+
+
+def test_possible_factors_determinism():
+    """Verify scoring and ranking are strictly deterministic for identical inputs."""
+    payload = {
+        "symptom_description": "Laptop running slowly and frequent freezing"
+    }
+    res1 = client.post("/diagnosis/predict", json=payload).json()
+    res2 = client.post("/diagnosis/predict", json=payload).json()
+
+    assert res1["primary_fault"] == res2["primary_fault"]
+    assert len(res1["alternatives"]) == len(res2["alternatives"])
+    for a1, a2 in zip(res1["alternatives"], res2["alternatives"]):
+        assert a1["fault_type"] == a2["fault_type"]
+        assert a1["relevance_score"] == a2["relevance_score"]
+        assert a1["relevance_level"] == a2["relevance_level"]
+        assert a1["matched_symptoms"] == a2["matched_symptoms"]
+
