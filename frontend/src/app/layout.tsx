@@ -4,8 +4,8 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
 export const metadata: Metadata = {
-  title: 'FAIRFIX — ML-Based Laptop Price Intelligence & Used Valuation',
-  description: 'Genuinely trained and evaluated machine learning price prediction and used laptop valuation platform for Indian consumer electronics.',
+  title: 'FairFix — Independent Laptop Value & Repair Decision Utility',
+  description: 'Understand your laptop’s estimated market value, explore potential faults, evaluate repair quotes, and make informed repair-versus-replace decisions.',
 };
 
 export default function RootLayout({
@@ -14,8 +14,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark scroll-smooth">
-      <body className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans antialiased selection:bg-cyan-500/20 selection:text-cyan-300">
+    <html lang="en" className="scroll-smooth">
+      <body className="min-h-screen bg-[#fbfbfd] text-slate-900 flex flex-col font-sans antialiased selection:bg-slate-200 selection:text-slate-900">
         <Navbar />
         <main className="flex-1">
           {children}

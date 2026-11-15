@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import {
+  Laptop,
   Cpu,
-  Layers,
+  HardDrive,
+  Monitor,
   Sparkles,
-  ShieldAlert,
   ShieldCheck,
   TrendingDown,
   Info,
@@ -14,7 +15,8 @@ import {
   DollarSign,
   ChevronDown,
   CheckCircle,
-  AlertTriangle
+  AlertTriangle,
+  ArrowRight
 } from 'lucide-react';
 import { LaptopSpecsInput, ValuationResponse } from '../../types';
 import { predictValuation } from '../../services/api';
@@ -205,42 +207,43 @@ export default function ValuationPage() {
   };
 
   return (
-    <div className="py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-10">
+    <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
       {/* Title & Presets Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200/80 pb-6">
         <div>
-          <span className="text-xs uppercase font-mono tracking-wider text-cyan-400 font-semibold">
-            Inference & Intelligence Engine
-          </span>
-          <h1 className="text-3xl font-bold text-white tracking-tight">Laptop Valuation Studio</h1>
-          <p className="text-sm text-slate-400 mt-1">
-            Configure hardware specifications and optional second-hand condition to calculate true market value.
+          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+            <Laptop className="h-3.5 w-3.5 text-slate-700" />
+            <span>Valuation Calculator</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Laptop Value Calculator</h1>
+          <p className="text-sm text-slate-600 mt-1">
+            Configure specifications and optional condition details to estimate fair market value.
           </p>
         </div>
 
         {/* Quick Presets */}
-        <div className="flex items-center gap-2 self-start md:self-auto">
-          <span className="text-xs text-slate-500 font-medium mr-1">Load Presets:</span>
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs text-slate-500 font-medium">Sample Configurations:</span>
           <button
             type="button"
             onClick={() => loadPreset('gaming')}
-            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 transition-colors"
+            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 shadow-sm transition-colors"
           >
-            Legion Gaming
+            Gaming Laptop
           </button>
           <button
             type="button"
             onClick={() => loadPreset('macbook')}
-            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 transition-colors"
+            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 shadow-sm transition-colors"
           >
-            Refurbished M3
+            MacBook Air M3
           </button>
           <button
             type="button"
             onClick={() => loadPreset('budget')}
-            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 transition-colors"
+            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 shadow-sm transition-colors"
           >
-            Used Pavilion
+            Everyday Pavilion
           </button>
         </div>
       </div>
@@ -248,20 +251,20 @@ export default function ValuationPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Specification Form */}
         <form onSubmit={handleSubmit} className="lg:col-span-7 space-y-6">
-          {/* Card 1: Core Identity & Category */}
-          <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-4">
-            <div className="flex items-center gap-2 text-cyan-400 text-sm font-semibold border-b border-slate-800/80 pb-3">
-              <Cpu className="h-4 w-4" />
-              <span>1. System Identity & Category</span>
+          {/* Card 1: Brand & Category */}
+          <div className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-sm space-y-4">
+            <div className="flex items-center gap-2 text-slate-900 text-sm font-semibold border-b border-slate-100 pb-3">
+              <Laptop className="h-4 w-4 text-slate-600" />
+              <span>1. Device Brand &amp; Category</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">Brand</label>
+                <label className="block text-xs font-medium text-slate-700 mb-1.5">Brand</label>
                 <select
                   value={brand}
                   onChange={(e) => setBrand(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
+                  className="w-full bg-slate-50/50 hover:bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all"
                 >
                   <option value="lenovo">Lenovo</option>
                   <option value="hp">HP</option>
@@ -273,542 +276,485 @@ export default function ValuationPage() {
                   <option value="samsung">Samsung</option>
                   <option value="alienware">Alienware</option>
                   <option value="gigabyte">Gigabyte</option>
-                  <option value="other">Other / White-label</option>
+                  <option value="other">Other / Standard</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">Product Model</label>
+                <label className="block text-xs font-medium text-slate-700 mb-1.5">Model Name</label>
                 <input
                   type="text"
                   value={model}
                   onChange={(e) => setModel(e.target.value)}
-                  placeholder="e.g. Legion Pro 5, Pavilion 15"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
+                  placeholder="e.g. Legion Pro 5"
+                  className="w-full bg-slate-50/50 hover:bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">Device Category</label>
+                <label className="block text-xs font-medium text-slate-700 mb-1.5">Category</label>
                 <select
                   value={deviceCategory}
                   onChange={(e) => setDeviceCategory(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
+                  className="w-full bg-slate-50/50 hover:bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all"
                 >
-                  <option value="Thin & Light">Thin & Light</option>
-                  <option value="Gaming">Gaming</option>
-                  <option value="Business">Business</option>
-                  <option value="Convertible">Convertible (2-in-1)</option>
-                  <option value="General">General / Everyday</option>
+                  <option value="Gaming">Gaming Laptop</option>
+                  <option value="Thin & Light">Thin &amp; Light / Ultrabook</option>
+                  <option value="Mainstream">Mainstream / Everyday</option>
+                  <option value="Workstation">Professional Workstation</option>
+                  <option value="Budget">Budget / Student</option>
                 </select>
               </div>
             </div>
           </div>
 
-          {/* Card 2: Processor (CPU) Specifications */}
-          <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-4">
-            <div className="flex items-center gap-2 text-cyan-400 text-sm font-semibold border-b border-slate-800/80 pb-3">
-              <Sliders className="h-4 w-4" />
-              <span>2. Processor (CPU) Architecture</span>
+          {/* Card 2: Processor (CPU) */}
+          <div className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-sm space-y-4">
+            <div className="flex items-center gap-2 text-slate-900 text-sm font-semibold border-b border-slate-100 pb-3">
+              <Cpu className="h-4 w-4 text-slate-600" />
+              <span>2. Processor &amp; Performance</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">CPU Manufacturer</label>
+                <label className="block text-xs font-medium text-slate-700 mb-1.5">CPU Brand</label>
                 <select
                   value={cpuBrand}
                   onChange={(e) => setCpuBrand(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
+                  className="w-full bg-slate-50/50 hover:bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all"
                 >
                   <option value="Intel">Intel</option>
                   <option value="AMD">AMD</option>
                   <option value="Apple">Apple Silicon</option>
-                  <option value="Snapdragon">Qualcomm Snapdragon</option>
+                  <option value="Qualcomm">Qualcomm Snapdragon</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">CPU Series Tier</label>
+                <label className="block text-xs font-medium text-slate-700 mb-1.5">Family / Series</label>
                 <select
                   value={cpuSeries}
                   onChange={(e) => setCpuSeries(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
+                  className="w-full bg-slate-50/50 hover:bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all"
                 >
-                  <option value="Core I5">Intel Core i5</option>
-                  <option value="Core I7">Intel Core i7</option>
-                  <option value="Core I3">Intel Core i3</option>
-                  <option value="Core I9">Intel Core i9</option>
-                  <option value="Core Ultra 7">Intel Core Ultra 7</option>
-                  <option value="Core Ultra 5">Intel Core Ultra 5</option>
-                  <option value="Core Ultra 9">Intel Core Ultra 9</option>
-                  <option value="Ryzen 5">AMD Ryzen 5</option>
-                  <option value="Ryzen 7">AMD Ryzen 7</option>
-                  <option value="Ryzen 9">AMD Ryzen 9</option>
-                  <option value="M1">Apple M1</option>
+                  <option value="Core Ultra 7">Core Ultra 7</option>
+                  <option value="Core Ultra 9">Core Ultra 9</option>
+                  <option value="Core Ultra 5">Core Ultra 5</option>
+                  <option value="Core I7">Core i7 (13th/14th Gen)</option>
+                  <option value="Core I5">Core i5 (13th/14th Gen)</option>
+                  <option value="Core I9">Core i9 Flagship</option>
+                  <option value="Ryzen 7">Ryzen 7</option>
+                  <option value="Ryzen 5">Ryzen 5</option>
+                  <option value="Ryzen 9">Ryzen 9</option>
+                  <option value="M3">Apple M3 / M3 Pro</option>
                   <option value="M2">Apple M2</option>
-                  <option value="M3">Apple M3</option>
-                  <option value="M4">Apple M4</option>
+                  <option value="M1">Apple M1</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">CPU Model Number</label>
-                <input
-                  type="text"
-                  value={cpuModel}
-                  onChange={(e) => setCpuModel(e.target.value)}
-                  placeholder="e.g. 13420H, 255HX, 7735HS"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-              <div>
-                <div className="flex justify-between text-xs mb-1">
-                  <span className="text-slate-300 font-medium">Physical CPU Cores</span>
-                  <span className="text-cyan-400 font-mono font-bold">{cpuCoreCount} Cores</span>
-                </div>
-                <input
-                  type="range"
-                  min="2"
-                  max="24"
+                <label className="block text-xs font-medium text-slate-700 mb-1.5">CPU Cores</label>
+                <select
                   value={cpuCoreCount}
-                  onChange={(e) => setCpuCoreCount(parseInt(e.target.value, 10))}
-                  className="w-full accent-cyan-500"
-                />
-              </div>
-
-              <div>
-                <div className="flex justify-between text-xs mb-1">
-                  <span className="text-slate-300 font-medium">Logical Execution Threads</span>
-                  <span className="text-cyan-400 font-mono font-bold">{cpuThreadCount} Threads</span>
-                </div>
-                <input
-                  type="range"
-                  min="2"
-                  max="32"
-                  value={cpuThreadCount}
-                  onChange={(e) => setCpuThreadCount(parseInt(e.target.value, 10))}
-                  className="w-full accent-cyan-500"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Card 3: Memory, Storage & Display */}
-          <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-4">
-            <div className="flex items-center gap-2 text-cyan-400 text-sm font-semibold border-b border-slate-800/80 pb-3">
-              <Layers className="h-4 w-4" />
-              <span>3. Memory, Storage & Display</span>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">RAM Capacity</label>
-                <select
-                  value={ramGb}
-                  onChange={(e) => setRamGb(parseInt(e.target.value, 10))}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
+                  onChange={(e) => {
+                    const c = parseInt(e.target.value, 10);
+                    setCpuCoreCount(c);
+                    setCpuThreadCount(c >= 12 ? c : c * 2);
+                  }}
+                  className="w-full bg-slate-50/50 hover:bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all"
                 >
-                  <option value={8}>8 GB</option>
-                  <option value={16}>16 GB</option>
-                  <option value={24}>24 GB</option>
-                  <option value={32}>32 GB</option>
-                  <option value={64}>64 GB</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">Storage Capacity</label>
-                <select
-                  value={storageGb}
-                  onChange={(e) => setStorageGb(parseInt(e.target.value, 10))}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
-                >
-                  <option value={256}>256 GB SSD</option>
-                  <option value={512}>512 GB SSD</option>
-                  <option value={1024}>1 TB SSD</option>
-                  <option value={2048}>2 TB SSD</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">Display Size</label>
-                <select
-                  value={displaySizeInch}
-                  onChange={(e) => setDisplaySizeInch(parseFloat(e.target.value))}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
-                >
-                  <option value={13.3}>13.3 Inches</option>
-                  <option value={14.0}>14.0 Inches</option>
-                  <option value={15.6}>15.6 Inches</option>
-                  <option value={16.0}>16.0 Inches</option>
-                  <option value={17.3}>17.3 Inches</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">Screen Resolution</label>
-                <select
-                  value={resolutionPreset}
-                  onChange={(e) => setResolutionPreset(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
-                >
-                  <option value="1920x1080">FHD (1920x1080)</option>
-                  <option value="1920x1200">WUXGA (1920x1200)</option>
-                  <option value="2560x1440">QHD (2560x1440)</option>
-                  <option value="2560x1600">WQXGA (2560x1600)</option>
-                  <option value="2880x1800">3K (2880x1800)</option>
-                  <option value="3840x2160">4K UHD (3840x2160)</option>
+                  <option value={4}>4 Cores</option>
+                  <option value={6}>6 Cores</option>
+                  <option value={8}>8 Cores</option>
+                  <option value={10}>10 Cores</option>
+                  <option value={12}>12 Cores</option>
+                  <option value={14}>14 Cores</option>
+                  <option value={16}>16 Cores</option>
+                  <option value={20}>20 Cores</option>
+                  <option value={24}>24 Cores</option>
                 </select>
               </div>
             </div>
           </div>
 
-          {/* Card 4: Graphics (GPU) Configuration */}
-          <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-4">
-            <div className="flex items-center gap-2 text-cyan-400 text-sm font-semibold border-b border-slate-800/80 pb-3">
-              <Sparkles className="h-4 w-4" />
-              <span>4. Graphics Processing Unit (GPU)</span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">GPU Architecture</label>
-                <select
-                  value={gpuType}
-                  onChange={(e) => setGpuType(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
-                >
-                  <option value="Integrated">Integrated Graphics</option>
-                  <option value="Dedicated">Dedicated GPU</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">GPU Family / Series</label>
-                <select
-                  value={gpuSeries}
-                  onChange={(e) => setGpuSeries(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
-                >
-                  <option value="GeForce RTX">NVIDIA GeForce RTX</option>
-                  <option value="Iris Xe">Intel Iris Xe</option>
-                  <option value="UHD">Intel UHD Graphics</option>
-                  <option value="Arc">Intel Arc Graphics</option>
-                  <option value="Radeon">AMD Radeon Graphics</option>
-                  <option value="Apple GPU">Apple Integrated GPU</option>
-                </select>
-              </div>
-
-              {gpuType === 'Dedicated' ? (
-                <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1">Dedicated VRAM</label>
-                  <select
-                    value={gpuVramGb}
-                    onChange={(e) => setGpuVramGb(parseFloat(e.target.value))}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
-                  >
-                    <option value={4.0}>4 GB GDDR6</option>
-                    <option value={6.0}>6 GB GDDR6</option>
-                    <option value={8.0}>8 GB GDDR6</option>
-                    <option value={12.0}>12 GB GDDR6</option>
-                    <option value={16.0}>16 GB GDDR6</option>
-                  </select>
-                </div>
-              ) : (
-                <div>
-                  <label className="block text-xs font-medium text-slate-500 mb-1">Dedicated VRAM</label>
-                  <div className="w-full bg-slate-950/40 border border-slate-800/40 rounded-lg px-3 py-2 text-xs text-slate-500">
-                    Shared System Memory (0 GB)
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Card 5: OS & Asking Price */}
-          <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-4">
-            <div className="flex items-center gap-2 text-cyan-400 text-sm font-semibold border-b border-slate-800/80 pb-3">
-              <DollarSign className="h-4 w-4" />
-              <span>5. Operating System & Seller Asking Price</span>
+          {/* Card 3: Memory & Storage */}
+          <div className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-sm space-y-4">
+            <div className="flex items-center gap-2 text-slate-900 text-sm font-semibold border-b border-slate-100 pb-3">
+              <HardDrive className="h-4 w-4 text-slate-600" />
+              <span>3. Memory &amp; Storage</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">Operating System</label>
+                <label className="block text-xs font-medium text-slate-700 mb-1.5">RAM Capacity</label>
                 <select
-                  value={osName}
-                  onChange={(e) => setOsName(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
+                  value={ramGb}
+                  onChange={(e) => setRamGb(parseInt(e.target.value, 10))}
+                  className="w-full bg-slate-50/50 hover:bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all"
                 >
-                  <option value="Windows">Windows 11 / 10</option>
-                  <option value="Mac">macOS</option>
-                  <option value="Linux">Linux / Ubuntu</option>
-                  <option value="Chrome">ChromeOS</option>
+                  <option value={8}>8 GB RAM</option>
+                  <option value={16}>16 GB RAM</option>
+                  <option value={32}>32 GB RAM</option>
+                  <option value={64}>64 GB RAM</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">
-                  Seller Asking Price (INR ₹) <span className="text-slate-500 font-normal">(Optional)</span>
-                </label>
-                <input
-                  type="number"
-                  value={askingPrice}
-                  onChange={(e) => setAskingPrice(e.target.value)}
-                  placeholder="e.g. 75000"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
-                />
+                <label className="block text-xs font-medium text-slate-700 mb-1.5">Storage Capacity</label>
+                <select
+                  value={storageGb}
+                  onChange={(e) => setStorageGb(parseInt(e.target.value, 10))}
+                  className="w-full bg-slate-50/50 hover:bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all"
+                >
+                  <option value={256}>256 GB NVMe SSD</option>
+                  <option value={512}>512 GB NVMe SSD</option>
+                  <option value={1024}>1 TB (1024 GB) NVMe SSD</option>
+                  <option value={2048}>2 TB (2048 GB) NVMe SSD</option>
+                </select>
               </div>
             </div>
           </div>
 
-          {/* Card 6: Used / Refurbished Condition Toggle */}
-          <div className="p-6 rounded-2xl bg-gradient-to-b from-slate-900/90 to-slate-950 border border-slate-800 space-y-5">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-              <div className="flex items-center gap-3">
-                <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${isUsed ? 'bg-amber-600/20 text-amber-400' : 'bg-slate-800 text-slate-400'}`}>
-                  <TrendingDown className="h-4 w-4" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-white">Used / Out-of-Warranty Valuation Layer</h3>
-                  <p className="text-xs text-slate-400">Apply empirical remanufacturing depreciation heuristics (Türkolmez et al. 2024)</p>
-                </div>
+          {/* Card 4: Display & Graphics */}
+          <div className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-sm space-y-4">
+            <div className="flex items-center gap-2 text-slate-900 text-sm font-semibold border-b border-slate-100 pb-3">
+              <Monitor className="h-4 w-4 text-slate-600" />
+              <span>4. Display &amp; Graphics</span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1.5">Screen Size</label>
+                <select
+                  value={displaySizeInch}
+                  onChange={(e) => setDisplaySizeInch(parseFloat(e.target.value))}
+                  className="w-full bg-slate-50/50 hover:bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all"
+                >
+                  <option value={13.3}>13.3 Inch</option>
+                  <option value={13.6}>13.6 Inch</option>
+                  <option value={14.0}>14.0 Inch</option>
+                  <option value={15.6}>15.6 Inch</option>
+                  <option value={16.0}>16.0 Inch</option>
+                  <option value={17.3}>17.3 Inch</option>
+                </select>
               </div>
 
-              <label className="relative inline-flex items-center cursor-pointer">
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1.5">Resolution</label>
+                <select
+                  value={resolutionPreset}
+                  onChange={(e) => setResolutionPreset(e.target.value)}
+                  className="w-full bg-slate-50/50 hover:bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all"
+                >
+                  <option value="1920x1080">FHD (1920x1080)</option>
+                  <option value="1920x1200">WUXGA (1920x1200)</option>
+                  <option value="2560x1440">QHD (2560x1440)</option>
+                  <option value="2560x1600">2.5K / WQXGA (2560x1600)</option>
+                  <option value="2880x1800">3K (2880x1800)</option>
+                  <option value="3840x2160">4K UHD (3840x2160)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1.5">Graphics Type</label>
+                <select
+                  value={gpuType}
+                  onChange={(e) => setGpuType(e.target.value)}
+                  className="w-full bg-slate-50/50 hover:bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all"
+                >
+                  <option value="Integrated">Integrated GPU</option>
+                  <option value="Dedicated">Dedicated GPU</option>
+                </select>
+              </div>
+            </div>
+
+            {gpuType === 'Dedicated' && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 mb-1.5">GPU Series</label>
+                  <select
+                    value={gpuSeries}
+                    onChange={(e) => setGpuSeries(e.target.value)}
+                    className="w-full bg-slate-50/50 hover:bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all"
+                  >
+                    <option value="GeForce RTX">NVIDIA GeForce RTX</option>
+                    <option value="Radeon">AMD Radeon RX</option>
+                    <option value="Arc">Intel Arc Discrete</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 mb-1.5">Dedicated VRAM</label>
+                  <select
+                    value={gpuVramGb}
+                    onChange={(e) => setGpuVramGb(parseFloat(e.target.value))}
+                    className="w-full bg-slate-50/50 hover:bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all"
+                  >
+                    <option value={4.0}>4 GB VRAM</option>
+                    <option value={6.0}>6 GB VRAM</option>
+                    <option value={8.0}>8 GB VRAM</option>
+                    <option value={12.0}>12 GB VRAM</option>
+                    <option value={16.0}>16 GB VRAM</option>
+                  </select>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Card 5: Second-Hand Condition (Optional Toggle) */}
+          <div className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2 text-slate-900 text-sm font-semibold">
+                <Sliders className="h-4 w-4 text-slate-600" />
+                <span>5. Device Condition &amp; Age</span>
+              </div>
+              <label className="flex items-center gap-2 cursor-pointer text-xs font-medium text-slate-700">
                 <input
                   type="checkbox"
                   checked={isUsed}
                   onChange={(e) => setIsUsed(e.target.checked)}
-                  className="sr-only peer"
+                  className="rounded border-slate-300 text-slate-900 focus:ring-slate-900 h-4 w-4"
                 />
-                <div className="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                <span>Used or Refurbished Device</span>
               </label>
             </div>
 
-            {isUsed && (
-              <div className="space-y-4 pt-2">
+            {isUsed ? (
+              <div className="space-y-4 pt-1">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-slate-300 font-medium">Device Age</span>
-                      <span className="text-amber-400 font-mono font-bold">{ageMonths} Months ({Math.round((ageMonths/12)*10)/10} yrs)</span>
-                    </div>
+                    <label className="block text-xs font-medium text-slate-700 mb-1.5">
+                      Elapsed Age: <span className="font-semibold text-slate-900">{ageMonths} Months</span>
+                    </label>
                     <input
                       type="range"
-                      min="1"
-                      max="60"
+                      min={1}
+                      max={60}
                       value={ageMonths}
                       onChange={(e) => setAgeMonths(parseInt(e.target.value, 10))}
-                      className="w-full accent-amber-500"
+                      className="w-full accent-slate-900"
                     />
+                    <div className="flex justify-between text-[11px] text-slate-400 mt-1">
+                      <span>1 mo</span>
+                      <span>2.5 yrs</span>
+                      <span>5 yrs</span>
+                    </div>
                   </div>
 
                   <div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-slate-300 font-medium">Battery Health</span>
-                      <span className="text-amber-400 font-mono font-bold">{batteryHealth}% Maximum Capacity</span>
-                    </div>
+                    <label className="block text-xs font-medium text-slate-700 mb-1.5">
+                      Battery Health: <span className="font-semibold text-slate-900">{batteryHealth}%</span>
+                    </label>
                     <input
                       type="range"
-                      min="30"
-                      max="100"
+                      min={40}
+                      max={100}
                       value={batteryHealth}
                       onChange={(e) => setBatteryHealth(parseInt(e.target.value, 10))}
-                      className="w-full accent-amber-500"
+                      className="w-full accent-slate-900"
                     />
+                    <div className="flex justify-between text-[11px] text-slate-400 mt-1">
+                      <span>40% (Degraded)</span>
+                      <span>80% (Typical)</span>
+                      <span>100% (New)</span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">Cosmetic Wear Grade</label>
+                    <label className="block text-xs font-medium text-slate-700 mb-1.5">Cosmetic Casing</label>
                     <select
                       value={cosmeticCondition}
                       onChange={(e) => setCosmeticCondition(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                      className="w-full bg-slate-50/50 hover:bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all"
                     >
-                      <option value="like_new">Like New / Pristine</option>
-                      <option value="good">Good (Normal wear)</option>
-                      <option value="fair">Fair (Scratches/scuffs)</option>
-                      <option value="poor">Poor (Heavy dents/cracks)</option>
+                      <option value="like_new">Like New / Flawless</option>
+                      <option value="good">Good (Minor normal scuffs)</option>
+                      <option value="fair">Fair (Visible scratches or dings)</option>
+                      <option value="poor">Poor (Heavy wear or dents)</option>
                     </select>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">Screen / Panel Condition</label>
+                    <label className="block text-xs font-medium text-slate-700 mb-1.5">Screen Glass</label>
                     <select
                       value={screenCondition}
                       onChange={(e) => setScreenCondition(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                      className="w-full bg-slate-50/50 hover:bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all"
                     >
-                      <option value="flawless">Flawless (Zero scratches)</option>
-                      <option value="minor_scratches">Minor hairline scratches</option>
+                      <option value="flawless">Flawless (No scratches)</option>
+                      <option value="minor_scratches">Micro-scratches</option>
                       <option value="visible_scratches">Visible scratches</option>
-                      <option value="dead_pixels_or_lines">Dead pixels / screen bleed</option>
+                      <option value="dead_pixels_or_lines">Dead pixels / lines</option>
                     </select>
-                  </div>
-
-                  <div className="flex items-center pt-5">
-                    <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
-                      <input
-                        type="checkbox"
-                        checked={hasWarranty}
-                        onChange={(e) => setHasWarranty(e.target.checked)}
-                        className="rounded bg-slate-950 border-slate-800 text-amber-500 focus:ring-0"
-                      />
-                      <span>Active Manufacturer Warranty (+6% bonus)</span>
-                    </label>
                   </div>
                 </div>
 
-                <div className="p-3 rounded-lg bg-amber-950/20 border border-amber-800/40 text-[11px] text-amber-300/80 leading-relaxed flex items-start gap-2">
-                  <Info className="h-4 w-4 shrink-0 mt-0.5 text-amber-400" />
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-xs text-slate-600 flex items-start gap-2">
+                  <Info className="h-4 w-4 text-slate-500 shrink-0 mt-0.5" />
                   <span>
-                    <strong>Experimental Literature Heuristic:</strong> Used-device depreciation is calculated using the
-                    econometric framework published in <em>Information Systems Frontiers</em> (Türkolmez et al. 2024).
-                    Clearly separate from the machine-learned replacement baseline.
+                    Second-hand depreciation uses econometric remanufacturing wear curves (Türkolmez et al. 2024). Not validated against used transaction logs.
                   </span>
                 </div>
               </div>
+            ) : (
+              <p className="text-xs text-slate-500">
+                Valuing as a brand-new retail unit. Toggle above if this is an out-of-warranty or pre-owned device to account for age and wear.
+              </p>
             )}
+          </div>
+
+          {/* Card 6: Asking Price (Optional for Deal Check) */}
+          <div className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-sm space-y-4">
+            <div className="flex items-center gap-2 text-slate-900 text-sm font-semibold border-b border-slate-100 pb-3">
+              <DollarSign className="h-4 w-4 text-slate-600" />
+              <span>6. Seller Asking Price (Optional Deal Evaluation)</span>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1.5">
+                Asking Price in INR (₹)
+              </label>
+              <input
+                type="number"
+                value={askingPrice}
+                onChange={(e) => setAskingPrice(e.target.value)}
+                placeholder="e.g. 85000"
+                className="w-full bg-slate-50/50 hover:bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all"
+              />
+              <span className="text-[11px] text-slate-400 mt-1 block">
+                Enter what the seller is asking to get an instant deal assessment (Fair Price, Great Deal, or Overpriced).
+              </span>
+            </div>
           </div>
 
           {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-4 rounded-xl text-base font-bold text-white bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 shadow-xl shadow-cyan-500/20 transition-all active:scale-[0.99] disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full py-3.5 rounded-xl text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 shadow-sm transition-all active:scale-[0.99] disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {loading ? (
               <span className="flex items-center gap-2">
                 <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
-                <span>Calculating Valuation via Gradient Boosting Pipeline...</span>
+                <span>Calculating Valuation...</span>
               </span>
             ) : (
-              <span>Compute FairFix Market Valuation</span>
+              <>
+                <span>Calculate Estimated Value</span>
+                <ArrowRight className="h-4 w-4" />
+              </>
             )}
           </button>
 
           {error && (
-            <div className="p-4 rounded-xl bg-red-950/50 border border-red-800 text-red-300 text-sm flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 shrink-0" />
+            <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 shrink-0 text-rose-600" />
               <span>{error}</span>
             </div>
           )}
         </form>
 
         {/* Valuation Result Panel */}
-        <div className="lg:col-span-5 lg:sticky lg:top-24 space-y-6">
+        <div className="lg:col-span-5 lg:sticky lg:top-20 space-y-6">
           {result ? (
-            <div className="rounded-2xl bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 p-6 sm:p-8 space-y-6 shadow-2xl">
-              {/* Header Badge */}
-              <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-                <span className="text-xs uppercase font-mono tracking-wider text-cyan-400 font-semibold">
+            <div className="rounded-2xl bg-white border border-slate-200/80 p-6 sm:p-7 space-y-5 shadow-sm">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                   Valuation Result
                 </span>
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-950 border border-emerald-800 text-emerald-400 font-mono">
-                  {result.model_name} (R² {result.model_r2_score})
+                <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-medium border border-slate-200">
+                  {result.used_valuation ? 'Second-Hand Adjusted' : 'New Retail Baseline'}
                 </span>
               </div>
 
               {/* Main Price Box */}
-              <div className="text-center space-y-2 py-2">
-                <span className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                  {result.used_valuation ? 'Adjusted Second-Hand Valuation' : 'Estimated Fair Market Value'}
+              <div className="text-center space-y-1.5 py-2">
+                <span className="text-xs font-medium text-slate-500">
+                  {result.used_valuation ? 'Estimated Used Market Value' : 'Estimated Retail Market Value'}
                 </span>
-                <div className="text-4xl sm:text-5xl font-black text-white font-mono tracking-tight">
+                <div className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight">
                   {formatRupee(result.valuation_inr)}
                 </div>
-                <div className="text-xs text-cyan-400/90 font-medium">
-                  Confidence Range: {formatRupee(result.price_range_low_inr)} – {formatRupee(result.price_range_high_inr)}
+                <div className="text-xs text-slate-500 font-medium">
+                  Expected Range: {formatRupee(result.price_range_low_inr)} – {formatRupee(result.price_range_high_inr)}
                 </div>
                 {result.used_valuation && (
-                  <div className="text-xs text-slate-400 pt-1">
-                    New Retail Baseline: <span className="font-mono text-slate-300">{formatRupee(result.new_price_baseline_inr)}</span>
+                  <div className="text-xs text-slate-500 pt-1">
+                    New Retail Baseline: <span className="font-semibold text-slate-800">{formatRupee(result.new_price_baseline_inr)}</span>
                   </div>
                 )}
               </div>
 
-              {/* Deal Assessment Card (if asking price was provided) */}
+              {/* Deal Assessment Card (if asking price provided) */}
               {result.deal_assessment && (
-                <div className={`p-4 rounded-xl border space-y-3 ${
+                <div className={`p-4 rounded-xl border space-y-2 ${
                   result.deal_assessment.verdict === 'GREAT_DEAL'
-                    ? 'bg-emerald-950/40 border-emerald-800/80 text-emerald-300'
+                    ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
                     : result.deal_assessment.verdict === 'FAIR_PRICE'
-                    ? 'bg-blue-950/40 border-blue-800/80 text-blue-300'
+                    ? 'bg-blue-50 border-blue-200 text-blue-900'
                     : result.deal_assessment.verdict === 'SLIGHTLY_OVERPRICED'
-                    ? 'bg-amber-950/40 border-amber-800/80 text-amber-300'
-                    : 'bg-red-950/40 border-red-800/80 text-red-300'
+                    ? 'bg-amber-50 border-amber-200 text-amber-900'
+                    : 'bg-rose-50 border-rose-200 text-rose-900'
                 }`}>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider">Market Deal Verdict</span>
-                    <span className="text-xs px-2 py-0.5 rounded font-mono font-bold bg-slate-900 border border-slate-800">
+                    <span className="text-xs font-bold uppercase tracking-wider">Deal Assessment</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full font-bold bg-white/80 border border-current">
                       {result.deal_assessment.difference_percentage > 0 ? '+' : ''}
                       {result.deal_assessment.difference_percentage}%
                     </span>
                   </div>
-                  <div className="text-base font-bold">
+                  <div className="text-sm font-bold">
                     {result.deal_assessment.verdict_label}
                   </div>
                   <div className="text-xs opacity-90">
-                    Seller asking price is <span className="font-mono font-bold">{formatRupee(result.deal_assessment.asking_price_inr)}</span> (
+                    Seller asking price is <span className="font-bold">{formatRupee(result.deal_assessment.asking_price_inr)}</span> (
                     {result.deal_assessment.difference_inr > 0 ? '+' : ''}
-                    {formatRupee(result.deal_assessment.difference_inr)} vs valuation).
+                    {formatRupee(result.deal_assessment.difference_inr)} vs estimated value).
                   </div>
                 </div>
               )}
 
-              {/* Used Depreciation Breakdown (if used) */}
+              {/* Condition Depreciation Breakdown (if used) */}
               {result.used_valuation && (
-                <div className="p-4 rounded-xl bg-slate-950 border border-slate-800/80 space-y-3">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-semibold text-white">Total Condition Depreciation</span>
-                    <span className="font-mono font-bold text-amber-400">-{result.used_valuation.depreciation_percentage}%</span>
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2.5 text-xs">
+                  <div className="flex items-center justify-between font-semibold text-slate-900 pb-1 border-b border-slate-200/60">
+                    <span>Total Condition Depreciation</span>
+                    <span className="text-rose-600 font-bold">-{result.used_valuation.depreciation_percentage}%</span>
                   </div>
 
-                  <div className="space-y-1.5 text-xs text-slate-400">
+                  <div className="space-y-1 text-slate-600">
                     <div className="flex justify-between">
-                      <span>Age Depreciation ({ageMonths} mos)</span>
-                      <span className="font-mono text-slate-300">-{result.used_valuation.breakdown.age_depreciation_pct}%</span>
+                      <span>Age Depreciation ({ageMonths} months)</span>
+                      <span className="font-medium text-slate-800">-{result.used_valuation.breakdown.age_depreciation_pct}%</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Battery Capacity Wear ({batteryHealth}%)</span>
-                      <span className="font-mono text-slate-300">-{result.used_valuation.breakdown.battery_penalty_pct}%</span>
+                      <span>Battery Capacity ({batteryHealth}%)</span>
+                      <span className="font-medium text-slate-800">-{result.used_valuation.breakdown.battery_penalty_pct}%</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Cosmetic Condition ({cosmeticCondition})</span>
-                      <span className="font-mono text-slate-300">-{result.used_valuation.breakdown.cosmetic_penalty_pct}%</span>
+                      <span>Cosmetic Wear ({cosmeticCondition})</span>
+                      <span className="font-medium text-slate-800">-{result.used_valuation.breakdown.cosmetic_penalty_pct}%</span>
                     </div>
-                    {result.used_valuation.breakdown.warranty_bonus_pct > 0 && (
-                      <div className="flex justify-between text-emerald-400">
-                        <span>Active Warranty Offset</span>
-                        <span className="font-mono">+{result.used_valuation.breakdown.warranty_bonus_pct}%</span>
-                      </div>
-                    )}
                   </div>
                 </div>
               )}
 
-              {/* Top SHAP Drivers */}
-              <div className="space-y-3">
-                <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                  <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
-                  <span>Key Influencing Drivers (SHAP Tree Values)</span>
+              {/* Top Specification Influences */}
+              <div className="space-y-2 pt-1">
+                <span className="text-xs font-semibold text-slate-700 uppercase tracking-wider block">
+                  Top Influencing Specifications
                 </span>
-                <div className="space-y-2">
-                  {result.key_drivers.slice(0, 5).map((driver, i) => (
+                <div className="space-y-1.5">
+                  {result.key_drivers.slice(0, 4).map((driver, i) => (
                     <div
                       key={i}
-                      className="flex items-center justify-between p-2.5 rounded-lg bg-slate-950/80 border border-slate-800/60 text-xs"
+                      className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-200/60 text-xs"
                     >
-                      <span className="text-slate-300 font-medium capitalize">{driver.feature.replace(/_/g, ' ')}</span>
+                      <span className="text-slate-700 font-medium capitalize">{driver.feature.replace(/_/g, ' ')}</span>
                       <span
-                        className={`font-mono font-bold ${
-                          driver.shap_value > 0 ? 'text-emerald-400' : 'text-slate-400'
+                        className={`font-semibold ${
+                          driver.shap_value > 0 ? 'text-emerald-700' : 'text-slate-500'
                         }`}
                       >
                         {driver.shap_value > 0 ? '+' : ''}
@@ -820,27 +766,27 @@ export default function ValuationPage() {
               </div>
 
               {/* Disclaimer */}
-              <div className="pt-2 text-[11px] text-slate-500 leading-relaxed border-t border-slate-800">
+              <div className="pt-3 border-t border-slate-100 text-[11px] text-slate-500 leading-relaxed">
                 {result.data_provenance_note}
               </div>
             </div>
           ) : (
-            <div className="rounded-2xl bg-slate-900/40 border border-slate-800 border-dashed p-8 text-center space-y-4">
-              <div className="h-12 w-12 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-500 mx-auto">
-                <Cpu className="h-6 w-6" />
+            <div className="rounded-2xl bg-white border border-slate-200/80 p-8 text-center space-y-4 shadow-sm">
+              <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 mx-auto">
+                <Laptop className="h-5 w-5" />
               </div>
-              <h3 className="text-base font-bold text-white">Awaiting Valuation Parameters</h3>
-              <p className="text-xs text-slate-400 max-w-xs mx-auto leading-relaxed">
-                Fill in the laptop hardware specifications on the left, optionally toggle used device condition, and click
-                <strong> Compute FairFix Market Valuation</strong>.
+              <h3 className="text-sm font-bold text-slate-900">Ready to Value Your Device</h3>
+              <p className="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
+                Fill in the specifications on the left, optionally toggle condition wear, and click
+                <strong> Calculate Estimated Value</strong>.
               </p>
-              <div className="pt-2">
+              <div className="pt-1">
                 <button
                   type="button"
-                  onClick={() => loadPreset('gaming')}
-                  className="px-4 py-2 rounded-lg text-xs font-semibold bg-cyan-950 text-cyan-400 border border-cyan-800/60 hover:bg-cyan-900/50 transition-colors"
+                  onClick={() => loadPreset('macbook')}
+                  className="px-3.5 py-1.5 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-800 transition-colors"
                 >
-                  Load Gaming Laptop Sample
+                  Load MacBook Air Sample
                 </button>
               </div>
             </div>

@@ -3,22 +3,21 @@
 import React, { useState, useEffect } from 'react';
 import {
   Wrench,
-  ShieldCheck,
-  AlertTriangle,
+  Laptop,
   CheckCircle2,
+  AlertTriangle,
   HelpCircle,
   TrendingUp,
-  Cpu,
-  Layers,
-  Sparkles,
   ArrowRight,
+  ArrowLeft,
   Search,
   DollarSign,
   Scale,
   RefreshCw,
-  ExternalLink,
+  Info,
+  ShieldAlert,
   ChevronRight,
-  Info
+  ShieldCheck
 } from 'lucide-react';
 import {
   predictDiagnosis,
@@ -34,17 +33,17 @@ import {
   RepairDecisionResponse
 } from '@/types';
 
-// Preset symptom queries for instant demo testing
-const SYMPTOM_PRESETS = [
+// Preset symptom queries for instant one-click testing
+const COMMON_SYMPTOMS = [
   {
-    label: 'Battery Draining Rapidly',
-    query: 'Battery drains within 15 minutes of unplugging and fails to hold charge beyond 30%',
-    brand: 'dell'
-  },
-  {
-    label: 'Black Display / Fan Spins',
+    label: 'Screen Stays Black on Boot',
     query: 'Laptop screen is completely blank on boot, fans spin loudly, external HDMI monitor works fine',
     brand: 'asus'
+  },
+  {
+    label: 'Battery Draining Rapidly',
+    query: 'Battery drains within 20 minutes of unplugging and fails to hold charge beyond 30%',
+    brand: 'dell'
   },
   {
     label: 'Liquid Spill on Keyboard',
@@ -57,21 +56,32 @@ const SYMPTOM_PRESETS = [
     brand: 'hp'
   },
   {
-    label: 'Dead / No Power (Motherboard)',
+    label: 'Completely Dead / Won’t Turn On',
     query: 'Completely dead laptop, no charging light indicator when plugged in, will not power on at all',
     brand: 'acer'
   }
 ];
 
-export default function RepairIntelligencePage() {
-  // Step 1: Diagnosis State
-  const [symptomText, setSymptomText] = useState('');
-  const [selectedBrand, setSelectedBrand] = useState('');
+export default function RepairAssistantPage() {
+  // Current active step in the guided journey (1 to 6)
+  const [currentStep, setCurrentStep] = useState<number>(1);
+
+  // Step 1: Laptop Details State
+  const [brand, setBrand] = useState<string>('dell');
+  const [model, setModel] = useState<string>('Inspiron 15');
+  const [deviceAgeYears, setDeviceAgeYears] = useState<number>(2.5);
+  const [deviceCondition, setDeviceCondition] = useState<string>('Good');
+  const [deviceMarketValue, setDeviceMarketValue] = useState<string>('38000');
+
+  // Step 2: Symptom State
+  const [symptomText, setSymptomText] = useState<string>(
+    'Laptop screen is completely blank on boot, fans spin loudly, external HDMI monitor works fine'
+  );
   const [isDiagnosing, setIsDiagnosing] = useState(false);
   const [diagnosisResult, setDiagnosisResult] = useState<DiagnosisResponse | null>(null);
   const [diagnosisError, setDiagnosisError] = useState<string | null>(null);
 
-  // Step 2: Pricing Benchmark State
+  // Step 4: Pricing Benchmark State
   const [pricingOptions, setPricingOptions] = useState<{
     components: string[];
     repair_types: string[];
@@ -83,17 +93,14 @@ export default function RepairIntelligencePage() {
   const [pricingEstimate, setPricingEstimate] = useState<RepairPricingEstimate | null>(null);
   const [pricingError, setPricingError] = useState<string | null>(null);
 
-  // Step 3: Quote Evaluator State
-  const [quotedPrice, setQuotedPrice] = useState<string>('3800');
+  // Step 5: Quote Evaluation State
+  const [quotedPrice, setQuotedPrice] = useState<string>('4200');
   const [isEvaluatingQuote, setIsEvaluatingQuote] = useState(false);
   const [quoteResult, setQuoteResult] = useState<QuoteEvaluationResponse | null>(null);
   const [quoteError, setQuoteError] = useState<string | null>(null);
 
-  // Step 4: Repair vs Replace Decision State
-  const [decisionRepairCost, setDecisionRepairCost] = useState<string>('4500');
-  const [decisionLaptopValue, setDecisionLaptopValue] = useState<string>('38000');
-  const [decisionAgeYears, setDecisionAgeYears] = useState<number>(2.5);
-  const [decisionCondition, setDecisionCondition] = useState<string>('Good');
+  // Step 6: Repair vs Replace Decision State
+  const [decisionRepairCost, setDecisionRepairCost] = useState<string>('4200');
   const [isDeciding, setIsDeciding] = useState(false);
   const [decisionResult, setDecisionResult] = useState<RepairDecisionResponse | null>(null);
   const [decisionError, setDecisionError] = useState<string | null>(null);
@@ -114,7 +121,12 @@ export default function RepairIntelligencePage() {
     loadOptions();
   }, []);
 
-  // Handler: Run Fault Diagnosis
+  // Format currency in INR
+  const formatRupee = (val: number) => {
+    return '₹' + Math.round(val).toLocaleString('en-IN');
+  };
+
+  // Handler: Run Fault Diagnosis (Step 2 -> Step 3)
   async function handleDiagnose(e?: React.FormEvent) {
     if (e) e.preventDefault();
     if (!symptomText.trim()) return;
@@ -122,13 +134,14 @@ export default function RepairIntelligencePage() {
     setIsDiagnosing(true);
     setDiagnosisError(null);
     try {
-      const res = await predictDiagnosis(symptomText, selectedBrand || undefined);
+      const res = await predictDiagnosis(symptomText, brand || undefined);
       setDiagnosisResult(res);
 
-      // Auto-suggest component for Step 2 if confident
-      if (res.is_confident && res.primary_fault) {
+      // Auto-suggest matching component for pricing if identified
+      if (res.primary_fault) {
         setSelectedComponent(res.primary_fault);
       }
+      setCurrentStep(3);
     } catch (err: any) {
       setDiagnosisError(err.message || 'Failed to analyze symptoms');
     } finally {
@@ -136,21 +149,22 @@ export default function RepairIntelligencePage() {
     }
   }
 
-  // Handler: Estimate Repair Cost Benchmark
-  async function handleEstimateCost() {
-    if (!selectedComponent) return;
+  // Handler: Estimate Repair Cost Benchmark (Step 4)
+  async function handleEstimateCost(comp?: string) {
+    const targetComp = comp || selectedComponent;
+    if (!targetComp) return;
 
     setIsEstimating(true);
     setPricingError(null);
     try {
       const res = await estimateRepairCost(
-        selectedComponent,
+        targetComp,
         selectedRepairType || undefined,
-        selectedBrand || undefined
+        brand || undefined
       );
       setPricingEstimate(res);
 
-      // Pre-fill quote evaluator and decision calculator with benchmark mid-point
+      // Pre-fill quote and decision inputs with midpoint
       if (res.found && res.total_estimated_range) {
         const mid = Math.round((res.total_estimated_range.min + res.total_estimated_range.max) / 2);
         setQuotedPrice(String(mid));
@@ -163,7 +177,14 @@ export default function RepairIntelligencePage() {
     }
   }
 
-  // Handler: Evaluate Quote
+  // Auto-fetch pricing estimate when moving to step 4
+  useEffect(() => {
+    if (currentStep === 4 && selectedComponent) {
+      handleEstimateCost(selectedComponent);
+    }
+  }, [currentStep, selectedComponent]);
+
+  // Handler: Evaluate Quote (Step 5)
   async function handleEvaluateQuote(e?: React.FormEvent) {
     if (e) e.preventDefault();
     const val = parseFloat(quotedPrice);
@@ -176,7 +197,7 @@ export default function RepairIntelligencePage() {
         val,
         selectedComponent,
         selectedRepairType || undefined,
-        selectedBrand || undefined
+        brand || undefined
       );
       setQuoteResult(res);
       setDecisionRepairCost(String(val));
@@ -187,11 +208,10 @@ export default function RepairIntelligencePage() {
     }
   }
 
-  // Handler: Evaluate Repair vs Replace Decision
-  async function handleDecisionAnalysis(e?: React.FormEvent) {
-    if (e) e.preventDefault();
+  // Handler: Evaluate Repair vs Replace Decision (Step 6)
+  async function handleDecisionAnalysis() {
     const cost = parseFloat(decisionRepairCost);
-    const value = parseFloat(decisionLaptopValue);
+    const value = parseFloat(deviceMarketValue);
     if (isNaN(cost) || cost <= 0 || isNaN(value) || value <= 0) return;
 
     setIsDeciding(true);
@@ -200,8 +220,8 @@ export default function RepairIntelligencePage() {
       const res = await evaluateRepairDecision({
         repair_cost: cost,
         device_market_value: value,
-        device_age_years: decisionAgeYears,
-        device_condition: decisionCondition,
+        device_age_years: deviceAgeYears,
+        device_condition: deviceCondition,
         component: selectedComponent
       });
       setDecisionResult(res);
@@ -212,309 +232,407 @@ export default function RepairIntelligencePage() {
     }
   }
 
-  return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
-      {/* Hero Header */}
-      <div className="relative border-b border-slate-800 bg-gradient-to-b from-slate-900 to-slate-950 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-700/50 text-xs font-semibold text-cyan-400 mb-3">
-                <Sparkles className="h-3.5 w-3.5" />
-                Supervised NLP Diagnosis + Illustrative Repair Cost Benchmarks
-              </div>
-              <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
-                Repair Intelligence & Decision Hub
-              </h1>
-              <p className="mt-2 text-base text-slate-400 max-w-3xl">
-                Diagnose laptop faults using real-world community repair telemetry (Open Repair Alliance), inspect illustrative
-                reference estimates for components and labour, evaluate technician quotes against heuristic ranges, and evaluate
-                repair-versus-replace feasibility with configurable economic thresholds.
-              </p>
-            </div>
+  // Auto-run decision analysis when moving to step 6
+  useEffect(() => {
+    if (currentStep === 6) {
+      handleDecisionAnalysis();
+    }
+  }, [currentStep, decisionRepairCost, deviceMarketValue]);
 
-            <div className="grid grid-cols-2 gap-3 sm:flex sm:items-center">
-              <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 text-center">
-                <span className="block text-xl font-bold text-cyan-400">3,511</span>
-                <span className="text-[11px] text-slate-400">Repair Records</span>
-              </div>
-              <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 text-center">
-                <span className="block text-xl font-bold text-emerald-400">72.4%</span>
-                <span className="text-[11px] text-slate-400">Diagnosis Accuracy</span>
-              </div>
-              <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 text-center">
-                <span className="block text-xl font-bold text-amber-400">33</span>
-                <span className="text-[11px] text-slate-400">Illustrative Benchmarks</span>
-              </div>
-            </div>
-          </div>
+  const stepsList = [
+    { number: 1, title: 'Laptop Details' },
+    { number: 2, title: 'Describe Symptoms' },
+    { number: 3, title: 'Fault Assessment' },
+    { number: 4, title: 'Indicative Costs' },
+    { number: 5, title: 'Evaluate Quote' },
+    { number: 6, title: 'Repair vs. Replace' }
+  ];
+
+  return (
+    <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto space-y-8">
+      {/* Page Header */}
+      <div className="border-b border-slate-200/80 pb-6 space-y-2">
+        <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+          <Wrench className="h-3.5 w-3.5 text-slate-700" />
+          <span>Consumer Diagnostic &amp; Decision Assistant</span>
+        </div>
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+          Laptop Repair Assistant
+        </h1>
+        <p className="text-sm text-slate-600 max-w-2xl">
+          Follow a guided, 6-step journey to understand what might be wrong with your laptop, explore typical repair costs, evaluate technician quotes, and decide whether fixing it makes financial sense.
+        </p>
+      </div>
+
+      {/* Guided Journey Stepper Bar */}
+      <div className="bg-white border border-slate-200/80 rounded-2xl p-3 shadow-sm">
+        <div className="grid grid-cols-2 sm:grid-cols-6 gap-2">
+          {stepsList.map((step) => {
+            const isActive = currentStep === step.number;
+            const isCompleted = currentStep > step.number;
+            return (
+              <button
+                key={step.number}
+                type="button"
+                onClick={() => setCurrentStep(step.number)}
+                className={`flex items-center gap-2 p-2.5 rounded-xl text-left transition-all ${
+                  isActive
+                    ? 'bg-slate-900 text-white shadow-sm'
+                    : isCompleted
+                    ? 'bg-slate-50 text-slate-800 hover:bg-slate-100'
+                    : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
+                }`}
+              >
+                <span
+                  className={`h-5 w-5 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
+                    isActive
+                      ? 'bg-white text-slate-900'
+                      : isCompleted
+                      ? 'bg-emerald-100 text-emerald-800'
+                      : 'bg-slate-200 text-slate-600'
+                  }`}
+                >
+                  {isCompleted ? '✓' : step.number}
+                </span>
+                <span className="text-xs font-semibold truncate">{step.title}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Main Multi-Stage Workflow */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+      {/* STEP 1: Select Laptop Details */}
+      {currentStep === 1 && (
+        <section className="p-6 sm:p-8 rounded-2xl bg-white border border-slate-200/80 shadow-sm space-y-6">
+          <div className="border-b border-slate-100 pb-4">
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Step 1 of 6</span>
+            <h2 className="text-xl font-bold text-slate-900 mt-1">Tell us about your laptop</h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Providing device details helps contextualize repair costs and evaluate whether repair makes financial sense.
+            </p>
+          </div>
 
-        {/* ========================================================================= */}
-        {/* STAGE 1: ML-BASED FAULT DIAGNOSIS */}
-        {/* ========================================================================= */}
-        <section className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 lg:p-8 backdrop-blur-sm shadow-xl">
-          <div className="flex items-center justify-between pb-6 border-b border-slate-800">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
-                <Wrench className="h-5 w-5" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Laptop Brand</label>
+              <select
+                value={brand}
+                onChange={(e) => setBrand(e.target.value)}
+                className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all"
+              >
+                <option value="dell">Dell</option>
+                <option value="hp">HP</option>
+                <option value="lenovo">Lenovo</option>
+                <option value="asus">ASUS</option>
+                <option value="acer">Acer</option>
+                <option value="apple">Apple</option>
+                <option value="msi">MSI</option>
+                <option value="samsung">Samsung</option>
+                <option value="other">Other / Standard Brand</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Model / Series (Optional)</label>
+              <input
+                type="text"
+                value={model}
+                onChange={(e) => setModel(e.target.value)}
+                placeholder="e.g. Inspiron 15, ThinkPad E14"
+                className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Device Age: <span className="text-slate-900 font-bold">{deviceAgeYears} Years</span>
+              </label>
+              <input
+                type="range"
+                min={0.5}
+                max={8}
+                step={0.5}
+                value={deviceAgeYears}
+                onChange={(e) => setDeviceAgeYears(parseFloat(e.target.value))}
+                className="w-full accent-slate-900"
+              />
+              <div className="flex justify-between text-[11px] text-slate-400 mt-1">
+                <span>Under 1 yr</span>
+                <span>3–4 yrs</span>
+                <span>7+ yrs</span>
               </div>
-              <div>
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  1. ML Laptop Fault Diagnosis
-                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800">
-                    Open Repair Alliance Model
-                  </span>
-                </h2>
-                <p className="text-xs text-slate-400">
-                  Enter symptoms or choose a common failure pattern to run our calibrated text classifier.
-                </p>
-              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Overall Physical Condition</label>
+              <select
+                value={deviceCondition}
+                onChange={(e) => setDeviceCondition(e.target.value)}
+                className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all"
+              >
+                <option value="Excellent">Excellent / Well Maintained</option>
+                <option value="Good">Good (Normal minor wear)</option>
+                <option value="Fair">Fair (Noticeable scratches / worn keys)</option>
+                <option value="Poor">Poor (Heavily degraded)</option>
+              </select>
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Estimated Current Market Value (₹)
+              </label>
+              <input
+                type="number"
+                value={deviceMarketValue}
+                onChange={(e) => setDeviceMarketValue(e.target.value)}
+                placeholder="e.g. 35000"
+                className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all"
+              />
+              <p className="text-[11px] text-slate-500 mt-1">
+                Used to compute the Repair-to-Value ratio in Step 6. (Tip: You can calculate this precisely using our Laptop Value tool).
+              </p>
             </div>
           </div>
 
-          <form onSubmit={handleDiagnose} className="mt-6 space-y-4">
-            {/* Symptom Preset Buttons */}
+          <div className="pt-2 flex justify-end">
+            <button
+              type="button"
+              onClick={() => setCurrentStep(2)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-white bg-slate-900 hover:bg-slate-800 shadow-sm transition-all"
+            >
+              <span>Next: Describe Symptoms</span>
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* STEP 2: Describe Symptoms */}
+      {currentStep === 2 && (
+        <section className="p-6 sm:p-8 rounded-2xl bg-white border border-slate-200/80 shadow-sm space-y-6">
+          <div className="border-b border-slate-100 pb-4">
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Step 2 of 6</span>
+            <h2 className="text-xl font-bold text-slate-900 mt-1">Describe what is malfunctioning</h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Explain the symptoms in your own words. Mention what happened (drops, spills, sudden shutoff) and what you see.
+            </p>
+          </div>
+
+          {/* Quick Preset Symptom Chips */}
+          <div className="space-y-2">
+            <span className="text-xs font-medium text-slate-500">Common Symptom Examples (Click to Test):</span>
+            <div className="flex flex-wrap gap-2">
+              {COMMON_SYMPTOMS.map((preset, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => {
+                    setSymptomText(preset.query);
+                    setBrand(preset.brand);
+                  }}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 transition-colors"
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Symptom Input Form */}
+          <form onSubmit={handleDiagnose} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                Quick Test Presets (Click to Load):
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Symptom Description
               </label>
-              <div className="flex flex-wrap gap-2">
-                {SYMPTOM_PRESETS.map((preset, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => {
-                      setSymptomText(preset.query);
-                      setSelectedBrand(preset.brand);
-                    }}
-                    className="text-xs px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700/80 text-slate-300 hover:bg-slate-700 hover:text-white transition-all flex items-center gap-1.5"
-                  >
-                    <span className="h-1.5 w-1.5 rounded-full bg-cyan-400"></span>
-                    {preset.label}
-                  </button>
-                ))}
-              </div>
+              <textarea
+                rows={4}
+                value={symptomText}
+                onChange={(e) => setSymptomText(e.target.value)}
+                placeholder="E.g. The laptop turns on and the power light comes on, but the display remains completely dark. It works when plugged into an external TV via HDMI..."
+                className="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3.5 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all leading-relaxed"
+              />
             </div>
 
-            {/* Input Symptom Description */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="md:col-span-3">
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                  Describe Problem Symptoms in Plain English:
-                </label>
-                <textarea
-                  rows={3}
-                  value={symptomText}
-                  onChange={(e) => setSymptomText(e.target.value)}
-                  placeholder="e.g., Screen flickers when moving the laptop lid, occasionally goes completely dark but external HDMI display works fine..."
-                  className="w-full rounded-xl bg-slate-950 border border-slate-800 px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-colors"
-                />
+            {diagnosisError && (
+              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 shrink-0 text-rose-600" />
+                <span>{diagnosisError}</span>
               </div>
+            )}
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                  Brand (Optional):
-                </label>
-                <select
-                  value={selectedBrand}
-                  onChange={(e) => setSelectedBrand(e.target.value)}
-                  className="w-full rounded-xl bg-slate-950 border border-slate-800 px-3 py-2.5 text-sm text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
-                >
-                  <option value="">Universal / Any</option>
-                  <option value="dell">Dell</option>
-                  <option value="hp">HP</option>
-                  <option value="lenovo">Lenovo</option>
-                  <option value="asus">ASUS</option>
-                  <option value="acer">Acer</option>
-                  <option value="apple">Apple</option>
-                  <option value="msi">MSI</option>
-                </select>
+            <div className="flex items-center justify-between pt-2">
+              <button
+                type="button"
+                onClick={() => setCurrentStep(1)}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors"
+              >
+                <ArrowLeft className="h-3.5 w-3.5" />
+                <span>Back: Laptop Details</span>
+              </button>
 
-                <button
-                  type="submit"
-                  disabled={isDiagnosing || !symptomText.trim()}
-                  className="mt-3.5 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 shadow-lg shadow-cyan-500/20 disabled:opacity-50 transition-all"
-                >
-                  {isDiagnosing ? (
-                    <>
-                      <RefreshCw className="h-4 w-4 animate-spin" />
-                      Classifying...
-                    </>
-                  ) : (
-                    <>
-                      <Search className="h-4 w-4" />
-                      Diagnose Fault
-                    </>
-                  )}
-                </button>
-              </div>
+              <button
+                type="submit"
+                disabled={isDiagnosing || !symptomText.trim()}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-white bg-slate-900 hover:bg-slate-800 shadow-sm transition-all disabled:opacity-50"
+              >
+                {isDiagnosing ? (
+                  <>
+                    <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+                    <span>Analyzing Symptoms...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Analyze Symptoms</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </>
+                )}
+              </button>
             </div>
           </form>
+        </section>
+      )}
 
-          {diagnosisError && (
-            <div className="mt-4 p-4 rounded-xl bg-red-950/60 border border-red-800/80 text-red-200 text-xs">
-              {diagnosisError}
-            </div>
-          )}
+      {/* STEP 3: Review Possible Fault Categories */}
+      {currentStep === 3 && (
+        <section className="p-6 sm:p-8 rounded-2xl bg-white border border-slate-200/80 shadow-sm space-y-6">
+          <div className="border-b border-slate-100 pb-4">
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Step 3 of 6</span>
+            <h2 className="text-xl font-bold text-slate-900 mt-1">Preliminary Fault Assessment</h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Based on the symptoms described, here are the most probable hardware or software subsystems involved.
+            </p>
+          </div>
 
-          {/* Diagnosis Results Card */}
-          {diagnosisResult && (
-            <div className="mt-6 pt-6 border-t border-slate-800 grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Primary Fault & Confidence */}
-              <div className="lg:col-span-1 p-5 rounded-xl bg-slate-950 border border-slate-800 space-y-4">
+          {diagnosisResult ? (
+            <div className="space-y-5">
+              {/* Primary Fault Banner */}
+              <div className="p-5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                    Predicted Primary Fault
+                  <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                    Primary Potential Failure Subsystem
                   </span>
                   <span
-                    className={`text-xs px-2.5 py-0.5 rounded-full font-semibold border ${
+                    className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${
                       diagnosisResult.is_confident
-                        ? 'bg-emerald-950 text-emerald-400 border-emerald-800'
-                        : 'bg-amber-950 text-amber-400 border-amber-800'
+                        ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                        : 'bg-amber-50 text-amber-800 border-amber-200'
                     }`}
                   >
-                    {diagnosisResult.status === 'CONFIDENT_DIAGNOSIS' ? 'Confident Match' : 'Low Confidence'}
+                    {diagnosisResult.is_confident ? 'Strong Symptom Match' : 'Preliminary Guidance'}
                   </span>
                 </div>
 
-                <div>
-                  <h3 className="text-2xl font-bold text-white">
-                    {diagnosisResult.primary_fault || 'Ambiguous Symptoms'}
-                  </h3>
-                  <div className="mt-2">
-                    <div className="flex justify-between text-xs text-slate-400 mb-1">
-                      <span>Model Probability</span>
-                      <span className="font-semibold text-cyan-400">
-                        {diagnosisResult.confidence_percentage}%
-                      </span>
-                    </div>
-                    <div className="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden">
-                      <div
-                        className="bg-gradient-to-r from-cyan-500 to-blue-500 h-2.5 rounded-full transition-all duration-500"
-                        style={{ width: `${Math.min(100, Math.max(10, diagnosisResult.confidence_percentage))}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
+                <h3 className="text-2xl font-bold text-slate-900">
+                  {diagnosisResult.primary_fault}
+                </h3>
 
-                {/* Influential Symptom Keywords */}
-                {diagnosisResult.influential_keywords.length > 0 && (
-                  <div>
-                    <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">
-                      Detected Symptom Keywords:
-                    </span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {diagnosisResult.influential_keywords.map((kw, i) => (
-                        <span key={i} className="text-xs px-2 py-0.5 rounded-md bg-slate-800 text-cyan-300 font-mono">
-                          {kw}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Alternative Categories */}
-                {diagnosisResult.alternatives.length > 0 && (
-                  <div>
-                    <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">
-                      Alternative Likelihoods:
-                    </span>
-                    <div className="space-y-1.5">
-                      {diagnosisResult.alternatives.map((alt, i) => (
-                        <div key={i} className="flex items-center justify-between text-xs text-slate-300">
-                          <span>{alt.fault_type}</span>
-                          <span className="font-mono text-slate-400">{alt.confidence_percentage}%</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Action Button: Push to Step 2 */}
-                {diagnosisResult.primary_fault && (
-                  <button
-                    onClick={() => {
-                      setSelectedComponent(diagnosisResult.primary_fault!);
-                      handleEstimateCost();
-                    }}
-                    className="w-full mt-2 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-cyan-950 text-cyan-300 hover:bg-cyan-900 border border-cyan-800 text-xs font-semibold transition-colors"
-                  >
-                    <span>Check Pricing for {diagnosisResult.primary_fault}</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </button>
-                )}
+                <p className="text-xs text-slate-600 leading-relaxed pt-1">
+                  Reported symptom profile: &ldquo;{diagnosisResult.input_symptom}&rdquo;
+                </p>
               </div>
 
-              {/* Physical Checks & Triage Guide */}
-              <div className="lg:col-span-2 p-5 rounded-xl bg-slate-950 border border-slate-800 flex flex-col justify-between">
-                <div>
-                  <h4 className="text-sm font-bold text-white flex items-center gap-2 mb-3">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-                    Recommended Hardware Triage Checks Before Incurring Repair Costs:
-                  </h4>
-                  <ul className="space-y-2.5 text-xs text-slate-300 leading-relaxed">
+              {/* Actionable Preliminary Checks */}
+              {diagnosisResult.suggested_checks && diagnosisResult.suggested_checks.length > 0 && (
+                <div className="p-4 rounded-xl bg-amber-50/70 border border-amber-200/60 space-y-1.5 text-xs text-amber-900">
+                  <div className="flex items-center gap-1.5 font-bold">
+                    <Info className="h-4 w-4 text-amber-700 shrink-0" />
+                    <span>Recommended Preliminary Test Before Service</span>
+                  </div>
+                  <ul className="list-disc pl-5 space-y-1 text-amber-800 leading-relaxed">
                     {diagnosisResult.suggested_checks.map((check, i) => (
-                      <li key={i} className="flex items-start gap-2">
-                        <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 mt-1.5 shrink-0"></span>
-                        <span>{check}</span>
-                      </li>
+                      <li key={i}>{check}</li>
                     ))}
                   </ul>
                 </div>
+              )}
 
-                <div className="mt-6 pt-4 border-t border-slate-900 text-[11px] text-slate-400 italic">
-                  <strong>Notice: </strong> {diagnosisResult.disclaimer}
+              {/* Candidate Failure Categories */}
+              {diagnosisResult.alternatives && diagnosisResult.alternatives.length > 0 && (
+                <div className="space-y-2 pt-1">
+                  <span className="text-xs font-semibold text-slate-700 uppercase tracking-wider block">
+                    Other Potential Contributing Factors
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {diagnosisResult.alternatives.slice(0, 4).map((alt, i) => (
+                      <div
+                        key={i}
+                        className="p-3 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center justify-between text-xs"
+                      >
+                        <span className="font-medium text-slate-800">{alt.fault_type}</span>
+                        <span className="text-slate-500 text-[11px]">{alt.confidence_percentage}% Match</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
+              )}
+
+              {/* Physical Check Disclaimer */}
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 text-[11px] text-slate-500 leading-relaxed flex items-start gap-2">
+                <ShieldAlert className="h-4 w-4 text-slate-400 shrink-0 mt-0.5" />
+                <span>
+                  <strong>Important Notice:</strong> Software-based diagnosis provides preliminary triage based on reported symptoms. It cannot detect internal electrical shorts, microscopic liquid corrosion, or blown power stages that require physical multimeter and bench testing by a qualified technician.
+                </span>
               </div>
+
+              <div className="flex items-center justify-between pt-2">
+                <button
+                  type="button"
+                  onClick={() => setCurrentStep(2)}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors"
+                >
+                  <ArrowLeft className="h-3.5 w-3.5" />
+                  <span>Re-describe Symptoms</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCurrentStep(4);
+                  }}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-white bg-slate-900 hover:bg-slate-800 shadow-sm transition-all"
+                >
+                  <span>Next: Explore Indicative Repair Costs</span>
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8 space-y-3">
+              <p className="text-sm text-slate-500">No diagnosis performed yet.</p>
+              <button
+                type="button"
+                onClick={() => setCurrentStep(2)}
+                className="px-4 py-2 rounded-xl text-xs font-medium text-white bg-slate-900"
+              >
+                Describe Symptoms
+              </button>
             </div>
           )}
         </section>
+      )}
 
-
-        {/* ========================================================================= */}
-        {/* STAGE 2: REPAIR COST INTELLIGENCE BENCHMARK */}
-        {/* ========================================================================= */}
-        <section className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 lg:p-8 backdrop-blur-sm shadow-xl">
-          <div className="flex items-center justify-between pb-6 border-b border-slate-800">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400">
-                <DollarSign className="h-5 w-5" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  2. Illustrative Repair Cost Reference Catalogue
-                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-800">
-                    Expert Heuristic Estimates
-                  </span>
-                </h2>
-                <p className="text-xs text-slate-400">
-                  Inspect illustrative reference ranges for replacement components and independent technician labour in INR (unverified independently).
-                </p>
-              </div>
-            </div>
+      {/* STEP 4: Explore Indicative Repair Cost Estimates */}
+      {currentStep === 4 && (
+        <section className="p-6 sm:p-8 rounded-2xl bg-white border border-slate-200/80 shadow-sm space-y-6">
+          <div className="border-b border-slate-100 pb-4">
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Step 4 of 6</span>
+            <h2 className="text-xl font-bold text-slate-900 mt-1">Indicative Repair Cost Benchmarks</h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Explore typical parts and labour price ranges for common laptop components.
+            </p>
           </div>
 
-          <div className="mt-4 p-3.5 rounded-xl bg-amber-950/40 border border-amber-800/60 text-amber-200/90 text-xs flex items-start gap-2.5">
-            <Info className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
-            <span>
-              <strong>Provenance Disclaimer:</strong> All component part and technician labour figures displayed in this reference catalogue are illustrative heuristic estimates synthesized from general IT market observations (Nehru Place, SP Road, Lamington Road). They are not independently verified market quotations, authorized manufacturer rate cards, or binding commercial estimates.
-            </span>
-          </div>
-
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+          {/* Component Selection */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                Component / Subsystem:
-              </label>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Component to Benchmark</label>
               <select
                 value={selectedComponent}
-                onChange={(e) => setSelectedComponent(e.target.value)}
-                className="w-full rounded-xl bg-slate-950 border border-slate-800 px-3 py-2.5 text-sm text-slate-100 focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                onChange={(e) => {
+                  setSelectedComponent(e.target.value);
+                  handleEstimateCost(e.target.value);
+                }}
+                className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all"
               >
                 {pricingOptions.components.map((c) => (
                   <option key={c} value={c}>{c}</option>
@@ -523,571 +641,397 @@ export default function RepairIntelligencePage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                Repair Type:
-              </label>
-              <select
-                value={selectedRepairType}
-                onChange={(e) => setSelectedRepairType(e.target.value)}
-                className="w-full rounded-xl bg-slate-950 border border-slate-800 px-3 py-2.5 text-sm text-slate-100 focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
-              >
-                <option value="">All / Any Repair Type</option>
-                {pricingOptions.repair_types.map((t) => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
-              </select>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Repair Location / Hub</label>
+              <div className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-600">
+                Major Electronics Hubs (Nehru Place, SP Road, Lamington Road)
+              </div>
+            </div>
+          </div>
+
+          {/* Benchmark Display Card */}
+          {pricingEstimate && pricingEstimate.found ? (
+            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-5">
+              <div className="flex items-center justify-between border-b border-slate-200/80 pb-3">
+                <div>
+                  <span className="text-xs font-medium text-slate-500">Benchmark Reference for</span>
+                  <h4 className="text-lg font-bold text-slate-900">{pricingEstimate.component}</h4>
+                </div>
+                <span className="text-xs px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200 font-medium">
+                  {pricingEstimate.representative_matches?.[0]?.repair_type || 'Component Service'}
+                </span>
+              </div>
+
+              {/* Three Column Cost Breakdown */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="p-4 rounded-xl bg-white border border-slate-200/80 space-y-1">
+                  <span className="text-xs text-slate-500">Parts Cost Range</span>
+                  <p className="text-base font-bold text-slate-900">
+                    {pricingEstimate.part_cost_range
+                      ? `${formatRupee(pricingEstimate.part_cost_range.min)} – ${formatRupee(pricingEstimate.part_cost_range.max)}`
+                      : 'Indicative'}
+                  </p>
+                  <p className="text-[11px] text-slate-400">Wholesale component price</p>
+                </div>
+
+                <div className="p-4 rounded-xl bg-white border border-slate-200/80 space-y-1">
+                  <span className="text-xs text-slate-500">Labour Fee Range</span>
+                  <p className="text-base font-bold text-slate-900">
+                    {pricingEstimate.labour_cost_range
+                      ? `${formatRupee(pricingEstimate.labour_cost_range.min)} – ${formatRupee(pricingEstimate.labour_cost_range.max)}`
+                      : 'Indicative'}
+                  </p>
+                  <p className="text-[11px] text-slate-400">Bench installation &amp; testing</p>
+                </div>
+
+                <div className="p-4 rounded-xl bg-white border border-slate-200/80 space-y-1">
+                  <span className="text-xs text-slate-500">Total Benchmark</span>
+                  <p className="text-lg font-black text-slate-900">
+                    {pricingEstimate.total_estimated_range
+                      ? `${formatRupee(pricingEstimate.total_estimated_range.min)} – ${formatRupee(pricingEstimate.total_estimated_range.max)}`
+                      : 'Indicative'}
+                  </p>
+                  <p className="text-[11px] text-emerald-700 font-medium">Indicative all-in estimate</p>
+                </div>
+              </div>
+
+              {pricingEstimate.representative_matches?.[0]?.part_description && (
+                <p className="text-xs text-slate-600 bg-white p-3 rounded-xl border border-slate-200/60">
+                  <strong>Standard Specification:</strong> {pricingEstimate.representative_matches[0].part_description}
+                </p>
+              )}
+
+              {/* Prominent Provenance Disclaimer */}
+              <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200/60 text-xs text-amber-900 flex items-start gap-2">
+                <Info className="h-4 w-4 text-amber-700 shrink-0 mt-0.5" />
+                <span>
+                  <strong>Indicative Reference Estimate:</strong> Actual costs may vary by location, service provider, component quality and availability. These figures represent expert heuristic benchmarks for consumer guidance.
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div className="p-6 rounded-xl bg-slate-50 text-center text-xs text-slate-500">
+              No specific benchmark range found for the selected component. Choose another item from the list above.
+            </div>
+          )}
+
+          <div className="flex items-center justify-between pt-2">
+            <button
+              type="button"
+              onClick={() => setCurrentStep(3)}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              <span>Back: Fault Assessment</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setCurrentStep(5)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-white bg-slate-900 hover:bg-slate-800 shadow-sm transition-all"
+            >
+              <span>Next: Evaluate Technician Quote</span>
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* STEP 5: Enter Technician Quotation and Evaluate It */}
+      {currentStep === 5 && (
+        <section className="p-6 sm:p-8 rounded-2xl bg-white border border-slate-200/80 shadow-sm space-y-6">
+          <div className="border-b border-slate-100 pb-4">
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Step 5 of 6</span>
+            <h2 className="text-xl font-bold text-slate-900 mt-1">Audit Technician Quotation</h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Enter the price quoted by a repair shop or technician to evaluate whether it is competitive, slightly marked up, or significantly overpriced.
+            </p>
+          </div>
+
+          <form onSubmit={handleEvaluateQuote} className="space-y-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Quoted Amount in INR (₹)
+                </label>
+                <input
+                  type="number"
+                  value={quotedPrice}
+                  onChange={(e) => setQuotedPrice(e.target.value)}
+                  placeholder="e.g. 4500"
+                  className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all font-semibold"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Evaluating Against Component
+                </label>
+                <div className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800">
+                  {selectedComponent}
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isEvaluatingQuote || !quotedPrice}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-white bg-slate-900 hover:bg-slate-800 shadow-sm transition-all disabled:opacity-50"
+            >
+              {isEvaluatingQuote ? (
+                <>
+                  <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+                  <span>Auditing Quote...</span>
+                </>
+              ) : (
+                <>
+                  <span>Evaluate Quotation</span>
+                  <ArrowRight className="h-4 w-4" />
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Quote Result Card */}
+          {quoteResult && (
+            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-200/80 pb-3">
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Quote Audit Verdict
+                </span>
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-bold border ${
+                    quoteResult.verdict === 'FAIR_AND_COMPETITIVE'
+                      ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                      : quoteResult.verdict === 'SLIGHTLY_ABOVE_REFERENCE'
+                      ? 'bg-amber-50 text-amber-800 border-amber-200'
+                      : quoteResult.verdict === 'BELOW_REFERENCE'
+                      ? 'bg-blue-50 text-blue-800 border-blue-200'
+                      : 'bg-rose-50 text-rose-800 border-rose-200'
+                  }`}
+                >
+                  {quoteResult.verdict_label || quoteResult.verdict}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                <div className="p-3.5 rounded-xl bg-white border border-slate-200/60">
+                  <span className="text-slate-500">Your Quote:</span>
+                  <p className="text-base font-bold text-slate-900 mt-0.5">
+                    {formatRupee(quoteResult.quoted_price ?? parseFloat(quotedPrice))}
+                  </p>
+                </div>
+                <div className="p-3.5 rounded-xl bg-white border border-slate-200/60">
+                  <span className="text-slate-500">Reference Benchmark:</span>
+                  <p className="text-base font-bold text-slate-900 mt-0.5">
+                    {quoteResult.benchmark_range
+                      ? `${formatRupee(quoteResult.benchmark_range.min)} – ${formatRupee(quoteResult.benchmark_range.max)}`
+                      : 'N/A'}
+                  </p>
+                </div>
+                <div className="p-3.5 rounded-xl bg-white border border-slate-200/60">
+                  <span className="text-slate-500">Variance from Benchmark:</span>
+                  {quoteResult.variance ? (
+                    <p
+                      className={`text-base font-bold mt-0.5 ${
+                        quoteResult.variance.difference_inr > 0 ? 'text-amber-700' : 'text-emerald-700'
+                      }`}
+                    >
+                      {quoteResult.variance.difference_inr > 0 ? '+' : ''}
+                      {formatRupee(quoteResult.variance.difference_inr)} ({quoteResult.variance.percentage > 0 ? '+' : ''}
+                      {quoteResult.variance.percentage}%)
+                    </p>
+                  ) : (
+                    <p className="text-base font-bold text-slate-700 mt-0.5">Aligned</p>
+                  )}
+                </div>
+              </div>
+
+              {quoteResult.explanation && (
+                <div className="p-4 rounded-xl bg-white border border-slate-200/60 space-y-1.5 text-xs text-slate-700 leading-relaxed">
+                  <p className="font-semibold text-slate-900">Analysis &amp; Advice:</p>
+                  <p>{quoteResult.explanation}</p>
+                </div>
+              )}
+
+              {quoteResult.suggested_questions && quoteResult.suggested_questions.length > 0 && (
+                <div className="p-4 rounded-xl bg-white border border-slate-200/60 space-y-2 text-xs text-slate-700 leading-relaxed">
+                  <p className="font-semibold text-slate-900">Questions to ask the technician before authorizing repair:</p>
+                  <ul className="list-disc pl-5 space-y-1 text-slate-600">
+                    {quoteResult.suggested_questions.map((q, idx) => (
+                      <li key={idx}>{q}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <p className="text-[11px] text-slate-400 italic">
+                Indicative reference estimate — actual costs may vary by location, service provider, component quality and availability.
+              </p>
+            </div>
+          )}
+
+          <div className="flex items-center justify-between pt-2">
+            <button
+              type="button"
+              onClick={() => setCurrentStep(4)}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              <span>Back: Indicative Costs</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setCurrentStep(6)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-white bg-slate-900 hover:bg-slate-800 shadow-sm transition-all"
+            >
+              <span>Next: Review Repair vs. Replace</span>
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* STEP 6: Review Repair-versus-Replacement Guidance */}
+      {currentStep === 6 && (
+        <section className="p-6 sm:p-8 rounded-2xl bg-white border border-slate-200/80 shadow-sm space-y-6">
+          <div className="border-b border-slate-100 pb-4">
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Step 6 of 6</span>
+            <h2 className="text-xl font-bold text-slate-900 mt-1">Repair vs. Replace Economic Guidance</h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Evaluating the financial wisdom of repairing versus replacing based on your laptop’s estimated market value and repair quote.
+            </p>
+          </div>
+
+          {/* Quick Parameters Re-check */}
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div>
+              <span className="text-slate-500">Repair Cost:</span>
+              <div className="flex items-center gap-1 mt-0.5">
+                <input
+                  type="number"
+                  value={decisionRepairCost}
+                  onChange={(e) => setDecisionRepairCost(e.target.value)}
+                  className="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-sm font-bold text-slate-900"
+                />
+              </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                Brand Filter:
-              </label>
-              <select
-                value={selectedBrand}
-                onChange={(e) => setSelectedBrand(e.target.value)}
-                className="w-full rounded-xl bg-slate-950 border border-slate-800 px-3 py-2.5 text-sm text-slate-100 focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
-              >
-                <option value="">Universal / All Brands</option>
-                <option value="Universal">Universal (Standard)</option>
-                <option value="Apple">Apple MacBook</option>
-                <option value="Dell">Dell</option>
-              </select>
+              <span className="text-slate-500">Device Market Value:</span>
+              <div className="flex items-center gap-1 mt-0.5">
+                <input
+                  type="number"
+                  value={deviceMarketValue}
+                  onChange={(e) => setDeviceMarketValue(e.target.value)}
+                  className="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-sm font-bold text-slate-900"
+                />
+              </div>
             </div>
 
             <div className="flex items-end">
               <button
                 type="button"
-                onClick={handleEstimateCost}
-                disabled={isEstimating}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm text-slate-950 bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 shadow-lg shadow-amber-500/20 disabled:opacity-50 transition-all"
+                onClick={handleDecisionAnalysis}
+                className="w-full py-2 px-3 rounded-lg text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 transition-colors"
               >
-                {isEstimating ? (
-                  <>
-                    <RefreshCw className="h-4 w-4 animate-spin" />
-                    Querying...
-                  </>
-                ) : (
-                  <>
-                    <Search className="h-4 w-4" />
-                    Inspect Benchmark
-                  </>
-                )}
+                Re-calculate
               </button>
             </div>
           </div>
 
-          {pricingError && (
-            <div className="mt-4 p-4 rounded-xl bg-red-950/60 border border-red-800/80 text-red-200 text-xs">
-              {pricingError}
-            </div>
-          )}
-
-          {pricingEstimate && !pricingEstimate.found && (
-            <div className="mt-4 p-4 rounded-xl bg-amber-950/60 border border-amber-800 text-amber-200 text-xs">
-              {pricingEstimate.message || 'No pricing benchmark found for this component.'}
-            </div>
-          )}
-
-          {/* Pricing Benchmark Display */}
-          {pricingEstimate && pricingEstimate.found && (
-            <div className="mt-6 pt-6 border-t border-slate-800 space-y-6">
-              {/* 3 Metric Cards: Part Range, Labour Range, Total Range */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-4 rounded-xl bg-slate-950 border border-slate-800">
-                  <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
-                    Physical Part Cost
-                  </span>
-                  <div className="mt-2 text-2xl font-extrabold text-cyan-400">
-                    ₹{pricingEstimate.part_cost_range?.min.toLocaleString('en-IN')} – ₹{pricingEstimate.part_cost_range?.max.toLocaleString('en-IN')}
-                  </div>
-                  <p className="mt-1 text-[11px] text-slate-500">Wholesale component replacement cost</p>
-                </div>
-
-                <div className="p-4 rounded-xl bg-slate-950 border border-slate-800">
-                  <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
-                    Technician Labour Range
-                  </span>
-                  <div className="mt-2 text-2xl font-extrabold text-amber-400">
-                    ₹{pricingEstimate.labour_cost_range?.min.toLocaleString('en-IN')} – ₹{pricingEstimate.labour_cost_range?.max.toLocaleString('en-IN')}
-                  </div>
-                  <p className="mt-1 text-[11px] text-slate-500">Bench labor & testing charges</p>
-                </div>
-
-                <div className="p-4 rounded-xl bg-slate-950 border border-emerald-900/60 shadow-lg shadow-emerald-950/20">
-                  <span className="text-xs text-emerald-400 font-semibold uppercase tracking-wider">
-                    Total Estimated Benchmark
-                  </span>
-                  <div className="mt-2 text-2xl font-extrabold text-emerald-400">
-                    ₹{pricingEstimate.total_estimated_range?.min.toLocaleString('en-IN')} – ₹{pricingEstimate.total_estimated_range?.max.toLocaleString('en-IN')}
-                  </div>
-                  <p className="mt-1 text-[11px] text-slate-400">Expected fair consumer invoice range</p>
-                </div>
-              </div>
-
-              {/* Representative Catalogue Records Table */}
-              {pricingEstimate.representative_matches && pricingEstimate.representative_matches.length > 0 && (
-                <div className="rounded-xl border border-slate-800 overflow-hidden bg-slate-950">
-                  <div className="p-3 bg-slate-900/80 border-b border-slate-800 flex items-center justify-between">
-                    <span className="text-xs font-semibold text-slate-300">
-                      Illustrative Heuristic Reference Records ({pricingEstimate.representative_matches.length}) — Unverified Independently
-                    </span>
-                    <span className="text-[11px] text-slate-400">
-                      Contextual IT Hub: {pricingEstimate.market_location}
-                    </span>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs">
-                      <thead className="bg-slate-900/40 text-slate-400 uppercase tracking-wider font-semibold border-b border-slate-800">
-                        <tr>
-                          <th className="p-3">ID</th>
-                          <th className="p-3">Category / Model</th>
-                          <th className="p-3">Part Description</th>
-                          <th className="p-3">Parts (₹)</th>
-                          <th className="p-3">Labour (₹)</th>
-                          <th className="p-3">Source & Location</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-800/80">
-                        {pricingEstimate.representative_matches.map((item) => (
-                          <tr key={item.record_id} className="hover:bg-slate-900/50">
-                            <td className="p-3 font-mono text-cyan-400">{item.record_id}</td>
-                            <td className="p-3 font-medium text-slate-200">{item.laptop_model_or_compatible_category}</td>
-                            <td className="p-3 text-slate-300 max-w-xs">{item.part_description}</td>
-                            <td className="p-3 text-cyan-300 font-semibold">
-                              ₹{item.part_price_min} – ₹{item.part_price_max}
-                            </td>
-                            <td className="p-3 text-amber-300 font-semibold">
-                              ₹{item.labour_min} – ₹{item.labour_max}
-                            </td>
-                            <td className="p-3 text-slate-400">
-                              <div>{item.source_name}</div>
-                              <div className="text-[10px] text-slate-500">{item.market_location}</div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </section>
-
-
-        {/* ========================================================================= */}
-        {/* STAGE 3: TECHNICIAN QUOTE EVALUATOR */}
-        {/* ========================================================================= */}
-        <section className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 lg:p-8 backdrop-blur-sm shadow-xl">
-          <div className="flex items-center justify-between pb-6 border-b border-slate-800">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400">
-                <Scale className="h-5 w-5" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  3. Technician Quote Evaluator
-                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-800">
-                    Transparent Markup Audit
-                  </span>
-                </h2>
-                <p className="text-xs text-slate-400">
-                  Compare any technician quotation against illustrative heuristic benchmarks to uncover overpricing or suspicious discounts.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-4 p-3 rounded-xl bg-purple-950/40 border border-purple-800/60 text-purple-200/90 text-xs flex items-start gap-2.5">
-            <Info className="h-4 w-4 text-purple-400 shrink-0 mt-0.5" />
-            <span>
-              <strong>Quote Audit Guidance:</strong> This tool compares technician pricing against illustrative heuristic reference benchmarks to assist in consumer negotiation and awareness. It is not an authoritative commercial appraisal.
-            </span>
-          </div>
-
-          <form onSubmit={handleEvaluateQuote} className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                Technician Quoted Price (₹ INR):
-              </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-sm font-semibold">₹</span>
-                <input
-                  type="number"
-                  min="100"
-                  step="50"
-                  value={quotedPrice}
-                  onChange={(e) => setQuotedPrice(e.target.value)}
-                  placeholder="e.g. 4500"
-                  className="w-full rounded-xl bg-slate-950 border border-slate-800 pl-8 pr-4 py-2.5 text-sm text-slate-100 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                Selected Component:
-              </label>
-              <input
-                type="text"
-                disabled
-                value={selectedComponent}
-                className="w-full rounded-xl bg-slate-900 border border-slate-800 px-3 py-2.5 text-sm text-slate-400 cursor-not-allowed"
-              />
-            </div>
-
-            <div className="flex items-end">
-              <button
-                type="submit"
-                disabled={isEvaluatingQuote || !quotedPrice}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500 shadow-lg shadow-purple-500/20 disabled:opacity-50 transition-all"
-              >
-                {isEvaluatingQuote ? (
-                  <>
-                    <RefreshCw className="h-4 w-4 animate-spin" />
-                    Auditing...
-                  </>
-                ) : (
-                  <>
-                    <Scale className="h-4 w-4" />
-                    Evaluate Quotation
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-
-          {quoteError && (
-            <div className="mt-4 p-4 rounded-xl bg-red-950/60 border border-red-800/80 text-red-200 text-xs">
-              {quoteError}
-            </div>
-          )}
-
-          {/* Quote Evaluation Result */}
-          {quoteResult && quoteResult.success && (
-            <div className="mt-6 pt-6 border-t border-slate-800 grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Verdict Card */}
-              <div className="lg:col-span-1 p-5 rounded-xl bg-slate-950 border border-slate-800 space-y-4">
-                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">
-                  Quote Audit Verdict
+          {/* Decision Verdict Card */}
+          {decisionResult && (
+            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-5">
+              <div className="flex items-center justify-between border-b border-slate-200/80 pb-3">
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Economic Recommendation
                 </span>
-
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`text-sm px-3 py-1 rounded-full font-bold border ${
-                      quoteResult.verdict === 'FAIR_AND_COMPETITIVE'
-                        ? 'bg-emerald-950 text-emerald-400 border-emerald-800'
-                        : quoteResult.verdict === 'BELOW_REFERENCE'
-                        ? 'bg-amber-950 text-amber-400 border-amber-800'
-                        : quoteResult.verdict === 'SLIGHTLY_ABOVE_REFERENCE'
-                        ? 'bg-orange-950 text-orange-400 border-orange-800'
-                        : 'bg-rose-950 text-rose-400 border-rose-800'
-                    }`}
-                  >
-                    {quoteResult.verdict_label}
-                  </span>
-                </div>
-
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between text-slate-300">
-                    <span>Quoted Amount:</span>
-                    <span className="font-bold text-white">₹{quoteResult.quoted_price?.toLocaleString('en-IN')}</span>
-                  </div>
-                  <div className="flex justify-between text-slate-300">
-                    <span>Benchmark Reference:</span>
-                    <span className="font-mono text-cyan-400">
-                      ₹{quoteResult.benchmark_range?.min.toLocaleString('en-IN')} – ₹{quoteResult.benchmark_range?.max.toLocaleString('en-IN')}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-slate-300">
-                    <span>Variance vs Market:</span>
-                    <span
-                      className={`font-mono font-bold ${
-                        (quoteResult.variance?.percentage ?? 0) > 15
-                          ? 'text-rose-400'
-                          : (quoteResult.variance?.percentage ?? 0) < -15
-                          ? 'text-amber-400'
-                          : 'text-emerald-400'
-                      }`}
-                    >
-                      {(quoteResult.variance?.percentage ?? 0) >= 0 ? '+' : ''}
-                      {quoteResult.variance?.percentage}%
-                    </span>
-                  </div>
-                </div>
-
-                <p className="text-xs text-slate-300 leading-relaxed border-t border-slate-900 pt-3">
-                  {quoteResult.explanation}
-                </p>
-              </div>
-
-              {/* Questions Checklist */}
-              <div className="lg:col-span-2 p-5 rounded-xl bg-slate-950 border border-slate-800 flex flex-col justify-between">
-                <div>
-                  <h4 className="text-sm font-bold text-white flex items-center gap-2 mb-3">
-                    <Info className="h-4 w-4 text-purple-400" />
-                    Essential Questions to Ask the Technician Before Approving:
-                  </h4>
-                  <div className="space-y-2.5">
-                    {quoteResult.suggested_questions?.map((q, idx) => (
-                      <div key={idx} className="flex items-start gap-2.5 p-2.5 rounded-lg bg-slate-900/60 border border-slate-800/80 text-xs text-slate-200">
-                        <span className="font-mono text-purple-400 font-bold">{idx + 1}.</span>
-                        <span>{q}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="mt-4 pt-3 border-t border-slate-900 flex items-center justify-between text-xs text-slate-400">
-                  <span>Benchmark Reference: {quoteResult.primary_source}</span>
-                  <button
-                    onClick={() => {
-                      if (quoteResult.quoted_price) {
-                        setDecisionRepairCost(String(quoteResult.quoted_price));
-                      }
-                    }}
-                    className="text-cyan-400 hover:text-cyan-300 font-semibold flex items-center gap-1"
-                  >
-                    <span>Use in Repair vs Replace Analysis</span>
-                    <ArrowRight className="h-3 w-3" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </section>
-
-
-        {/* ========================================================================= */}
-        {/* STAGE 4: REPAIR-VERSUS-REPLACE DECISION ENGINE */}
-        {/* ========================================================================= */}
-        <section className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 lg:p-8 backdrop-blur-sm shadow-xl">
-          <div className="flex items-center justify-between pb-6 border-b border-slate-800">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-                <TrendingUp className="h-5 w-5" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  4. Repair-versus-Replace Decision Engine
-                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800">
-                    Configurable Decision Heuristics
-                  </span>
-                </h2>
-                <p className="text-xs text-slate-400">
-                  Synthesize laptop valuation with estimated repair costs using configurable heuristic thresholds (30% / 50% Rule).
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-4 p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-800/60 text-emerald-200/90 text-xs flex items-start gap-2.5">
-            <Info className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
-            <span>
-              <strong>Decision Engine Notice:</strong> The 30% and 50% repair-to-value thresholds are heuristic decision rules derived from consumer electronics life-cycle literature. Actual repair economics depend on physical device condition, internal wear, replacement part authenticity, technician warranty duration, and user workflow needs. This output does not constitute definitive financial advice.
-            </span>
-          </div>
-
-          <form onSubmit={handleDecisionAnalysis} className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                Estimated Repair Cost (₹):
-              </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-sm font-semibold">₹</span>
-                <input
-                  type="number"
-                  min="500"
-                  step="100"
-                  value={decisionRepairCost}
-                  onChange={(e) => setDecisionRepairCost(e.target.value)}
-                  className="w-full rounded-xl bg-slate-950 border border-slate-800 pl-8 pr-4 py-2.5 text-sm text-slate-100 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                Laptop Market Value (₹):
-              </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-sm font-semibold">₹</span>
-                <input
-                  type="number"
-                  min="2000"
-                  step="500"
-                  value={decisionLaptopValue}
-                  onChange={(e) => setDecisionLaptopValue(e.target.value)}
-                  className="w-full rounded-xl bg-slate-950 border border-slate-800 pl-8 pr-4 py-2.5 text-sm text-slate-100 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                Device Age: {decisionAgeYears} Years
-              </label>
-              <input
-                type="range"
-                min="0.5"
-                max="8"
-                step="0.5"
-                value={decisionAgeYears}
-                onChange={(e) => setDecisionAgeYears(parseFloat(e.target.value))}
-                className="w-full h-2 mt-3 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                Device Condition:
-              </label>
-              <select
-                value={decisionCondition}
-                onChange={(e) => setDecisionCondition(e.target.value)}
-                className="w-full rounded-xl bg-slate-950 border border-slate-800 px-3 py-2.5 text-sm text-slate-100 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
-              >
-                <option value="Excellent">Excellent (Minor cosmetic signs)</option>
-                <option value="Good">Good (Normal wear)</option>
-                <option value="Fair">Fair (Noticeable scratches/scuffs)</option>
-                <option value="Heavy Wear">Heavy Wear / Damaged Casing</option>
-              </select>
-            </div>
-
-            <div className="sm:col-span-2 lg:col-span-4">
-              <button
-                type="submit"
-                disabled={isDeciding || !decisionRepairCost || !decisionLaptopValue}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-bold text-sm text-slate-950 bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-300 hover:to-teal-400 shadow-lg shadow-emerald-500/20 disabled:opacity-50 transition-all"
-              >
-                {isDeciding ? (
-                  <>
-                    <RefreshCw className="h-4 w-4 animate-spin" />
-                    Computing Decision...
-                  </>
-                ) : (
-                  <>
-                    <TrendingUp className="h-4 w-4" />
-                    Compute Repair vs Replace Economic Recommendation
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-
-          {decisionError && (
-            <div className="mt-4 p-4 rounded-xl bg-red-950/60 border border-red-800/80 text-red-200 text-xs">
-              {decisionError}
-            </div>
-          )}
-
-          {/* Decision Results Card */}
-          {decisionResult && decisionResult.success && (
-            <div className="mt-6 pt-6 border-t border-slate-800 grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Verdict & Ratio Card */}
-              <div className="lg:col-span-1 p-5 rounded-xl bg-slate-950 border border-slate-800 space-y-4">
-                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">
-                  Financial Recommendation
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-bold border ${
+                    decisionResult.verdict === 'REPAIR_RECOMMENDED'
+                      ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                      : decisionResult.verdict === 'BORDERLINE_EVALUATE' || decisionResult.verdict === 'BORDERLINE_LEAN_REPLACE'
+                      ? 'bg-amber-50 text-amber-800 border-amber-200'
+                      : 'bg-rose-50 text-rose-800 border-rose-200'
+                  }`}
+                >
+                  {decisionResult.verdict_label || decisionResult.verdict}
                 </span>
+              </div>
 
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`text-base px-3.5 py-1.5 rounded-full font-extrabold border ${
-                      decisionResult.verdict === 'REPAIR_RECOMMENDED'
-                        ? 'bg-emerald-950 text-emerald-400 border-emerald-800'
-                        : decisionResult.verdict === 'BORDERLINE_EVALUATE'
-                        ? 'bg-amber-950 text-amber-400 border-amber-800'
-                        : 'bg-rose-950 text-rose-400 border-rose-800'
-                    }`}
-                  >
-                    {decisionResult.verdict_label}
+              {/* Ratio Gauge */}
+              <div className="p-4 rounded-xl bg-white border border-slate-200/80 space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-semibold text-slate-700">Repair Cost Ratio</span>
+                  <span className="font-extrabold text-base text-slate-900">
+                    {decisionResult.repair_cost_ratio_pct ?? 0}% of device value
                   </span>
                 </div>
-
-                {/* Repair Cost Ratio Gauge */}
-                <div>
-                  <div className="flex justify-between text-xs text-slate-300 mb-1">
-                    <span>Repair-to-Value Ratio</span>
-                    <span className="font-bold font-mono text-cyan-400">
-                      {decisionResult.repair_cost_ratio_pct}%
-                    </span>
-                  </div>
-                  <div className="w-full bg-slate-800 rounded-full h-3 overflow-hidden flex">
-                    {/* Safe repair zone <= 30% */}
-                    <div
-                      className={`h-3 ${
-                        (decisionResult.repair_cost_ratio_pct ?? 0) <= 30
-                          ? 'bg-emerald-500'
-                          : (decisionResult.repair_cost_ratio_pct ?? 0) <= 50
-                          ? 'bg-amber-500'
-                          : 'bg-rose-500'
-                      } transition-all duration-500`}
-                      style={{ width: `${Math.min(100, decisionResult.repair_cost_ratio_pct ?? 0)}%` }}
-                    ></div>
-                  </div>
-                  <div className="flex justify-between text-[10px] text-slate-500 mt-1">
-                    <span>0% (Ideal)</span>
-                    <span>30% (Standard)</span>
-                    <span>50% (Max Limit)</span>
-                    <span>100%</span>
-                  </div>
+                <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all ${
+                      (decisionResult.repair_cost_ratio_pct ?? 0) <= 30
+                        ? 'bg-emerald-600'
+                        : (decisionResult.repair_cost_ratio_pct ?? 0) <= 50
+                        ? 'bg-amber-500'
+                        : 'bg-rose-600'
+                    }`}
+                    style={{ width: `${Math.min(decisionResult.repair_cost_ratio_pct ?? 0, 100)}%` }}
+                  ></div>
                 </div>
-
-                <div className="border-t border-slate-900 pt-3 space-y-1.5 text-xs text-slate-300">
-                  <div className="flex justify-between">
-                    <span>Repair Cost:</span>
-                    <span className="font-mono text-white">
-                      ₹{decisionResult.financial_breakdown?.repair_cost_inr.toLocaleString('en-IN')}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Current Device Value:</span>
-                    <span className="font-mono text-cyan-400">
-                      ₹{decisionResult.financial_breakdown?.device_market_value_inr.toLocaleString('en-IN')}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Net Equity Retained:</span>
-                    <span className="font-mono text-emerald-400 font-bold">
-                      ₹{decisionResult.financial_breakdown?.net_equity_after_repair_inr.toLocaleString('en-IN')}
-                    </span>
-                  </div>
+                <div className="flex justify-between text-[11px] text-slate-400 pt-0.5">
+                  <span>0% – 30% (Repair Sensible)</span>
+                  <span>30% – 50% (Borderline)</span>
+                  <span>50%+ (Replace Favored)</span>
                 </div>
               </div>
 
-              {/* Economic Summary and Factors */}
-              <div className="lg:col-span-2 p-5 rounded-xl bg-slate-950 border border-slate-800 flex flex-col justify-between">
-                <div>
-                  <h4 className="text-sm font-bold text-white mb-2">
-                    Economic Assessment & Methodology:
-                  </h4>
-                  <p className="text-xs text-slate-300 leading-relaxed mb-4">
-                    {decisionResult.economic_summary}
-                  </p>
-
-                  <h5 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-                    Key Decision Drivers:
-                  </h5>
-                  <ul className="space-y-2 text-xs text-slate-300">
-                    {decisionResult.decision_factors?.map((factor, i) => (
-                      <li key={i} className="flex items-start gap-2">
-                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 mt-1.5 shrink-0"></span>
-                        <span>{factor}</span>
-                      </li>
+              {/* Actionable Guidance */}
+              <div className="p-4 rounded-xl bg-white border border-slate-200/80 space-y-2 text-xs leading-relaxed text-slate-700">
+                {decisionResult.economic_summary && (
+                  <p className="font-bold text-slate-900 text-sm">{decisionResult.economic_summary}</p>
+                )}
+                {decisionResult.decision_factors && decisionResult.decision_factors.length > 0 && (
+                  <ul className="list-disc pl-5 space-y-1 text-slate-600">
+                    {decisionResult.decision_factors.map((factor, idx) => (
+                      <li key={idx}>{factor}</li>
                     ))}
                   </ul>
-                </div>
+                )}
+              </div>
 
-                <div className="mt-6 pt-4 border-t border-slate-900 flex items-center justify-between text-[11px] text-slate-400">
-                  <span>Economic Threshold: Repair cost {'>'} 50% of residual value recommends replacement.</span>
-                  <span className="font-mono text-cyan-400">FairFix Decision Protocol v1.1</span>
-                </div>
+              {/* Consumer Economics Heuristic Notice */}
+              <div className="p-3.5 rounded-xl bg-slate-100 border border-slate-200 text-[11px] text-slate-500 leading-relaxed flex items-start gap-2">
+                <Info className="h-4 w-4 text-slate-500 shrink-0 mt-0.5" />
+                <span>
+                  <strong>Configurable Consumer Economics Heuristic (30% / 50% Rule):</strong> Recommendations are based on standard consumer asset preservation guidelines. Factors like component availability, remaining warranty, and device sentimental value should also be considered.
+                </span>
               </div>
             </div>
           )}
-        </section>
 
-      </div>
+          <div className="flex items-center justify-between pt-2">
+            <button
+              type="button"
+              onClick={() => setCurrentStep(5)}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              <span>Back: Audit Quote</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setCurrentStep(1)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-white bg-slate-900 hover:bg-slate-800 shadow-sm transition-all"
+            >
+              <span>Start New Assessment</span>
+              <RefreshCw className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
